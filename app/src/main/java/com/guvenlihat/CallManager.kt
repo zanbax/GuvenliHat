@@ -1,0 +1,367 @@
+package com.guvenlihat
+
+import android.content.Context
+import android.content.Intent
+import android.os.Build
+import android.os.Handler
+import android.os.Looper
+import android.os.PowerManager
+import android.os.SystemClock
+import android.telecom.Call
+import android.telecom.CallAudioState
+import android.telecom.VideoProfile
+
+/**
+ * Uygulamanın beyni: aramaları takip eder, bilinmeyenleri engeller,
+ * süre dolunca görüşmeyi keser ve güvenli kişileri sırayla arar.
+ */
+object CallManager {
+
+    const val REASON_UNKNOWN = "unknown"
+    const val REASON_REDIAL = "redial"
+
+    /** 112 vb. aradıktan sonra bu süre boyunca gelen aramalar engellenmez (geri arama için). */
+    private const val EMERGENCY_GRACE_MS = 60 * 60_000L
+
+    /** Güvenli kişi bu sürede açmazsa sıradakine geçilir. */
+    private const val CHAIN_RING_TIMEOUT_MS = 45_000L
+
+    class CallInfo(
+        val number: String?,
+        val incoming: Boolean,
+        val limited: Boolean,
+        val fromChain: Boolean,
+        val unknown: Boolean,
+    ) {
+        var activeSince = 0L
+        var wasActive = false
+        var cutByLimit = false
+    }
+
+    private val main = Handler(Looper.getMainLooper())
+    private val calls = mutableListOf<Call>()
+    private val infos = HashMap<Call, CallInfo>()
+    private val listeners = LinkedHashSet<() -> Unit>()
+    private lateinit var app: Context
+
+    var service: GuardInCallService? = null
+
+    /** Görüşme ekranında gösterilen büyük sarı uyarı. */
+    var banner: String? = null
+        private set
+
+    private var chainActive = false
+    private var chainIndex = 0
+    private var wakeLock: PowerManager.WakeLock? = null
+
+    private val callback = object : Call.Callback() {
+        override fun onStateChanged(call: Call, state: Int) = handleState(call, state)
+        override fun onDetailsChanged(call: Call, details: Call.Details) = notifyUi()
+    }
+
+    // ---------- Arayüz bağlantısı ----------
+
+    fun addListener(l: () -> Unit) {
+        listeners.add(l)
+    }
+
+    fun removeListener(l: () -> Unit) {
+        listeners.remove(l)
+    }
+
+    fun notifyUi() {
+        listeners.toList().forEach { it() }
+        if (::app.isInitialized) CallNotification.update(app)
+    }
+
+    fun clearBanner() {
+        banner = null
+        notifyUi()
+    }
+
+    @Suppress("DEPRECATION")
+    fun stateOf(call: Call): Int = if (Build.VERSION.SDK_INT >= 31) call.details.state else call.state
+
+    fun hasCalls() = calls.isNotEmpty()
+
+    fun info(call: Call): CallInfo? = infos[call]
+
+    fun primaryCall(): Call? {
+        val order = intArrayOf(
+            Call.STATE_RINGING, Call.STATE_SELECT_PHONE_ACCOUNT, Call.STATE_DIALING,
+            Call.STATE_CONNECTING, Call.STATE_ACTIVE, Call.STATE_HOLDING,
+        )
+        for (s in order) calls.firstOrNull { stateOf(it) == s }?.let { return it }
+        return calls.firstOrNull()
+    }
+
+    // ---------- Engelleme kararı (ScreeningService ve InCallService ortak) ----------
+
+    /** Gelen arama engellenecekse nedeni, değilse null. */
+    fun blockReason(ctx: Context, number: String?): String? {
+        val prefs = Prefs(ctx)
+        if (number != null && !PhoneUtils.isEmergency(number) &&
+            prefs.redialBlockedUntil(PhoneUtils.key(number)) > 0
+        ) return REASON_REDIAL
+        if (!prefs.filterUnknown) return null
+        if (PhoneUtils.isSafe(prefs, number)) return null
+        if (System.currentTimeMillis() - prefs.lastEmergencyCallAt < EMERGENCY_GRACE_MS) return null
+        return if (PhoneUtils.isKnown(ctx, number) == false) REASON_UNKNOWN else null
+    }
+
+    fun reportBlocked(ctx: Context, number: String?, reason: String) {
+        val text = when {
+            reason == REASON_REDIAL -> "Az önce görüşmesi kesilen $number numarası tekrar aradı, engellendi."
+            number == null -> "Gizli numaradan arandı, arama engellendi."
+            else -> "Rehberde olmayan $number numarası aradı, arama engellendi."
+        }
+        Notifier.send(ctx, text, throttleKey = "blk_" + PhoneUtils.key(number).ifEmpty { "gizli" })
+    }
+
+    // ---------- InCallService olayları ----------
+
+    fun onCallAdded(svc: GuardInCallService, call: Call) {
+        app = svc.applicationContext
+        val prefs = Prefs(app)
+        val number = PhoneUtils.numberOf(call)
+        val state = stateOf(call)
+        val incoming = if (Build.VERSION.SDK_INT >= 29) {
+            call.details.callDirection == Call.Details.DIRECTION_INCOMING
+        } else {
+            state == Call.STATE_RINGING
+        }
+        val emergency = PhoneUtils.isEmergency(number)
+        if (!incoming && emergency) prefs.lastEmergencyCallAt = System.currentTimeMillis()
+
+        // 1) Gelen arama: süzgeç servisi çalışmadıysa burada yedek olarak engelle
+        if (incoming) {
+            val reason = blockReason(app, number)
+            if (reason != null) {
+                call.reject(false, null)
+                reportBlocked(app, number, reason)
+                return
+            }
+        }
+
+        // 2) Az önce kesilen numarayı geri arama denemesi
+        if (!incoming && !emergency && number != null &&
+            prefs.redialBlockedUntil(PhoneUtils.key(number)) > 0
+        ) {
+            call.disconnect()
+            banner = "Bu numara güvenliğiniz için şu an aranamaz.\nLütfen bir yakınınızı arayın."
+            Notifier.send(
+                app, "Az önce görüşmesi kesilen $number numarasını tekrar aramaya çalıştı, engellendi.",
+                throttleKey = "redialout_" + PhoneUtils.key(number),
+            )
+            showUi(app)
+            return
+        }
+
+        val safe = PhoneUtils.isSafe(prefs, number)
+        val unknown = PhoneUtils.isKnown(app, number) == false
+        val fromChain = chainActive && !incoming && safe
+        val limited = prefs.limitMinutes > 0 && !emergency && !safe && when (prefs.limitMode) {
+            LimitMode.UNKNOWN_ONLY -> unknown
+            LimitMode.ALL_EXCEPT_SAFE -> true
+        }
+
+        if (!incoming && unknown && !emergency && !safe) {
+            Notifier.send(
+                app, "Rehberde olmayan $number numarasını arıyor.",
+                throttleKey = "out_" + PhoneUtils.key(number), throttleMs = 30 * 60_000L,
+            )
+        }
+        // Zincir sürerken kişi başka birini ararsa zinciri bırak
+        if (chainActive && !fromChain && !incoming) chainActive = false
+
+        val info = CallInfo(number, incoming, limited, fromChain, unknown)
+        infos[call] = info
+        calls.add(call)
+        call.registerCallback(callback, main)
+
+        if (fromChain) {
+            main.postAtTime(Runnable {
+                if (infos[call]?.wasActive == false) call.disconnect()
+            }, call, SystemClock.uptimeMillis() + CHAIN_RING_TIMEOUT_MS)
+        }
+
+        handleState(call, state)
+        showUi(app)
+    }
+
+    fun onCallRemoved(call: Call) {
+        call.unregisterCallback(callback)
+        main.removeCallbacksAndMessages(call)
+        calls.remove(call)
+        val info = infos.remove(call)
+        if (infos.values.none { it.limited && it.wasActive }) releaseWakeLock()
+
+        if (info != null) {
+            if (info.cutByLimit) {
+                main.postDelayed({ startChain() }, 1500)
+            } else if (info.fromChain && !info.wasActive && chainActive) {
+                chainIndex++
+                main.postDelayed({ placeChainCall() }, 2000)
+            }
+        }
+        notifyUi()
+    }
+
+    private fun handleState(call: Call, state: Int) {
+        val info = infos[call] ?: return
+        when (state) {
+            Call.STATE_ACTIVE -> if (!info.wasActive) {
+                info.wasActive = true
+                info.activeSince = SystemClock.elapsedRealtime()
+                if (info.fromChain) {
+                    // Güvenli kişi açtı, zincir tamam
+                    chainActive = false
+                    banner = null
+                }
+                if (info.limited) startLimitTimer(call, info)
+            }
+            Call.STATE_SELECT_PHONE_ACCOUNT -> if (info.fromChain) {
+                PhoneUtils.defaultAccount(app)?.let { call.phoneAccountSelected(it, false) }
+            }
+        }
+        notifyUi()
+    }
+
+    // ---------- Süre sınırı ----------
+
+    private fun startLimitTimer(call: Call, info: CallInfo) {
+        val minutes = Prefs(app).limitMinutes
+        if (minutes <= 0) return
+        val limitMs = minutes * 60_000L
+        // Ekran kapalıyken de zamanlayıcı işlesin
+        acquireWakeLock(limitMs + 5 * 60_000L)
+        val now = SystemClock.uptimeMillis()
+
+        if (minutes >= 2) {
+            main.postAtTime(Runnable {
+                if (infos[call] != null) {
+                    Notifier.send(
+                        app,
+                        "${who(info)} ile ${minutes / 2} dakikadır konuşuyor. " +
+                            "$minutes dakikada otomatik kesilecek.",
+                    )
+                }
+            }, call, now + limitMs / 2)
+        }
+        main.postAtTime(Runnable { cutCall(call, info, minutes) }, call, now + limitMs)
+    }
+
+    private fun cutCall(call: Call, info: CallInfo, minutes: Int) {
+        if (infos[call] == null) return
+        val prefs = Prefs(app)
+        info.cutByLimit = true
+        info.number?.let { prefs.blockRedial(PhoneUtils.key(it), prefs.redialBlockMinutes) }
+        banner = "Bu konuşma güvenliğiniz için sonlandırıldı."
+        Notifier.send(
+            app,
+            "${who(info)} ile $minutes dakika konuştu, görüşme otomatik KESİLDİ. " +
+                "Dolandırıcılık olabilir, lütfen hemen arayın!",
+        )
+        call.disconnect()
+        showUi(app)
+    }
+
+    private fun who(info: CallInfo): String {
+        val n = info.number ?: return "Gizli numara"
+        if (info.unknown) return "$n (rehberde yok)"
+        val name = PhoneUtils.contactName(app, n)
+        return if (name != null) "$name ($n)" else n
+    }
+
+    // ---------- Güvenli kişileri sırayla arama ----------
+
+    private fun startChain() {
+        val contacts = Prefs(app).safeContacts
+        if (contacts.isEmpty()) {
+            banner = "Bu konuşma güvenliğiniz için sonlandırıldı.\nLütfen bir yakınınızı arayın."
+            notifyUi()
+            showUi(app)
+            return
+        }
+        chainActive = true
+        chainIndex = 0
+        placeChainCall()
+    }
+
+    private fun placeChainCall() {
+        if (!chainActive) return
+        val contacts = Prefs(app).safeContacts
+        if (chainIndex >= contacts.size) {
+            chainActive = false
+            banner = "Yakınlarınıza şu an ulaşılamadı.\nOnlara haber verildi, sizi arayacaklar."
+            Notifier.send(app, "Görüşme kesildikten sonra yakınlarına telefonla ulaşılamadı. Lütfen hemen arayın!")
+            notifyUi()
+            showUi(app)
+            return
+        }
+        val c = contacts[chainIndex]
+        banner = "Bu konuşma güvenliğiniz için sonlandırıldı.\n${c.name} aranıyor..."
+        notifyUi()
+        showUi(app)
+        PhoneUtils.placeCall(app, c.number, autoSim = true)
+    }
+
+    // ---------- Ekrandaki düğmeler ----------
+
+    fun answer() {
+        calls.firstOrNull { stateOf(it) == Call.STATE_RINGING }?.answer(VideoProfile.STATE_AUDIO_ONLY)
+    }
+
+    fun hangup() {
+        val c = primaryCall() ?: return
+        if (infos[c]?.fromChain == true) chainActive = false
+        if (stateOf(c) == Call.STATE_RINGING) c.reject(false, null) else c.disconnect()
+    }
+
+    @Suppress("DEPRECATION")
+    fun isSpeakerOn(): Boolean = service?.callAudioState?.route == CallAudioState.ROUTE_SPEAKER
+
+    @Suppress("DEPRECATION")
+    fun toggleSpeaker() {
+        val s = service ?: return
+        s.setAudioRoute(if (isSpeakerOn()) CallAudioState.ROUTE_WIRED_OR_EARPIECE else CallAudioState.ROUTE_SPEAKER)
+    }
+
+    @Suppress("DEPRECATION")
+    fun isMuted(): Boolean = service?.callAudioState?.isMuted == true
+
+    fun toggleMute() {
+        service?.setMuted(!isMuted())
+    }
+
+    fun showUi(ctx: Context) {
+        CallNotification.update(ctx)
+        try {
+            ctx.startActivity(Intent(ctx, InCallActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+        } catch (e: Exception) {
+            // Arka plandan açılamazsa tam ekran bildirim devreye girer
+        }
+    }
+
+    // ---------- Uyanık tutma ----------
+
+    private fun acquireWakeLock(timeoutMs: Long) {
+        try {
+            if (wakeLock == null) {
+                val pm = app.getSystemService(PowerManager::class.java) ?: return
+                wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "guvenlihat:limit").apply {
+                    setReferenceCounted(false)
+                }
+            }
+            wakeLock?.acquire(timeoutMs)
+        } catch (e: Exception) {
+        }
+    }
+
+    private fun releaseWakeLock() {
+        try {
+            if (wakeLock?.isHeld == true) wakeLock?.release()
+        } catch (e: Exception) {
+        }
+    }
+}
