@@ -4,6 +4,9 @@ on:
   push:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -22,8 +25,21 @@ jobs:
           chmod +x gradlew
           ./gradlew assembleDebug --stacktrace
 
+      - name: APK'yı adlandır
+        run: cp app/build/outputs/apk/debug/app-debug.apk GuvenliHat.apk
+
       - name: APK'yı yükle
         uses: actions/upload-artifact@v4
         with:
           name: GuvenliHat-apk
-          path: app/build/outputs/apk/debug/*.apk
+          path: GuvenliHat.apk
+
+      - name: Sürümler (Releases) sayfasına koy
+        if: github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v0.1.${{ github.run_number }}
+          name: Güvenli Hat 0.1.${{ github.run_number }}
+          body: Telefondan GuvenliHat.apk dosyasına dokunup indirin ve kurun. Eski sürümün üzerine kurulur, ayarlar silinmez.
+          files: GuvenliHat.apk
+          make_latest: true

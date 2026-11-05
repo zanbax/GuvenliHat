@@ -28,7 +28,7 @@ Acil numaralar (112, 155, 110...) aranırken asla kesilmez. 112 arandıktan sonr
 3. Depo sayfasında **"uploading an existing file"** bağlantısına tıklayın. Bu zip'in içindeki **bütün dosya ve klasörleri** sürükleyip bırakın, sonra **Commit changes** deyin.
    - Önemli: `.github` klasörü gizli klasördür. Bilgisayarınızda görünmüyorsa gizli dosyaları gösterin, yoksa otomatik derleme çalışmaz.
 4. **Actions** sekmesine geçin. "APK oluştur" işi kendiliğinden başlar ve 3-5 dakika sürer. Başlamazsa **Run workflow** düğmesine basın.
-5. İş yeşil tik alınca işe tıklayın. Sayfanın altındaki **Artifacts** bölümünden `GuvenliHat-apk` dosyasını indirin. Zip'in içinden APK çıkar.
+5. İş yeşil tik alınca deponun ana sayfasında sağdaki **Releases** bölümüne girin ve en üstteki sürümden `GuvenliHat.apk` dosyasını indirin. Bunu doğrudan telefondan da yapabilirsiniz.
 
 ### Yol B: Android Studio ile
 
