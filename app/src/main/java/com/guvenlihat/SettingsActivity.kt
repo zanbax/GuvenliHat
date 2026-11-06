@@ -370,7 +370,7 @@ class SettingsActivity : Activity() {
 
         // Destek (deneme sürecinde testçiler için)
         section("Destek")
-        note("Bir sorun olursa ya da görüşünüzü iletmek isterseniz: telefon bilgisi ve son olaylar otomatik eklenir, telefon numaraları gizlenir. Göndermeden önce içeriği görebilirsiniz.")
+        note("Bir sorun olursa ya da görüşünüzü iletmek isterseniz: telefon bilgisi ve son olaylar otomatik eklenir, telefon numaraları gizlenir. Göndermeden önce içeriği görebilirsiniz. Destek adresi: " + Support.EMAIL)
         smallButton("Sorun bildir", Ui.ORANGE) { Support.reportProblem(this) }
         smallButton("Geri bildirim gönder (anket)") { Support.sendFeedback(this) }
 

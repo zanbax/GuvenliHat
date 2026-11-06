@@ -14,8 +14,8 @@ import android.widget.EditText
  */
 object Support {
 
-    /** Destek e-posta adresi. Boşsa kişi gönderilecek uygulamayı ve alıcıyı kendisi seçer. */
-    const val EMAIL = ""
+    /** Destek e-posta adresi (e-posta seçilirse alıcıya hazır yazılır; WhatsApp da seçilebilir). */
+    const val EMAIL = "guvenlihatdestek@proton.me"
 
     val FEEDBACK_QUESTIONS = listOf(
         "1) Kurulumu kim yaptı, yaklaşık kaç dakika sürdü?",

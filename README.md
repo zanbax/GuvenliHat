@@ -96,3 +96,7 @@ Kendi telefonuna kurup ikinci bir telefonla dene:
 - `InCallService` (varsayılan telefon uygulaması) + `CallScreeningService` (sessiz engelleme)
 - Bütün kod `app/src/main/java/com/guvenlihat/` altında. Asıl mantık `CallManager.kt` içinde.
 - APK sabit bir anahtarla imzalanıyor (`app/debug.keystore`), böylece yeni sürümler eskisinin üzerine kurulabiliyor. Depoyu **gizli (private)** tutun.
+
+## Destek
+
+Sorun ve öneriler için: **guvenlihatdestek@proton.me** (uygulamada Aile → Destek → Sorun bildir).
