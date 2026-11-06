@@ -41,7 +41,7 @@ object CareMonitor {
 
     // ---------------- Planlama ----------------
 
-    fun isActive(prefs: Prefs) = prefs.inactivityHours > 0 || prefs.locationEnabled
+    fun isActive(prefs: Prefs) = prefs.inactivityHours > 0 || prefs.locationEnabled || prefs.lowBatteryAlert
 
     /** Bir sonraki kontrolü kurar (gerekmiyorsa iptal eder). */
     fun schedule(ctx: Context) {
@@ -79,6 +79,8 @@ object CareMonitor {
         schedule(ctx)
         val prefs = Prefs(ctx)
         val now = System.currentTimeMillis()
+        prefs.lastTickAt = now
+        checkBattery(ctx, prefs)
 
         val inactivityAlert = checkInactivity(ctx, prefs, now)
         val locationDue = isLocationDue(prefs, now)
@@ -98,6 +100,52 @@ object CareMonitor {
             }
             done()
         }
+    }
+
+    // ---------------- Düşük pil ----------------
+
+    /** Pil %15 ve altına düşüp şarja takılmadıysa bir kez uyarır; şarja takılınca ya da %30'u geçince sıfırlanır. */
+    fun checkBattery(ctx: Context, prefs: Prefs) {
+        if (!prefs.lowBatteryAlert) return
+        val bm = ctx.getSystemService(BatteryManager::class.java) ?: return
+        val level = try {
+            bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
+        } catch (e: Exception) {
+            -1
+        }
+        if (level !in 0..100) return
+        val charging = try {
+            bm.isCharging
+        } catch (e: Exception) {
+            false
+        }
+        if (charging || level >= 30) {
+            prefs.lowBatteryAlerted = false
+            return
+        }
+        if (level <= 15 && !prefs.lowBatteryAlerted) {
+            prefs.lowBatteryAlerted = true
+            Notifier.send(
+                ctx,
+                "🔋 Telefonun pili %$level ve şarja takılı değil. Kapanmadan önce arayıp şarja takmasını hatırlatın.",
+            )
+        }
+    }
+
+    /** Telefon yeniden açıldığında aileye haber ver. */
+    fun onBoot(ctx: Context) {
+        val prefs = Prefs(ctx)
+        if (prefs.bootAlert) {
+            val last = prefs.lastTickAt
+            val lastText = if (last > 0) {
+                " Kapanmadan önce en son " + SimpleDateFormat("d MMMM HH:mm", Locale("tr")).format(Date(last)) +
+                    " civarında çalışıyordu."
+            } else {
+                ""
+            }
+            Notifier.send(ctx, "📱 Telefon yeniden açıldı.$lastText ${batteryText(ctx)}".trim())
+        }
+        schedule(ctx)
     }
 
     // ---------------- Hareketsizlik ----------------
@@ -417,7 +465,8 @@ class CareReceiver : BroadcastReceiver() {
                     }
                 }.start()
             }
-            else -> CareMonitor.schedule(app) // BOOT_COMPLETED, MY_PACKAGE_REPLACED
+            Intent.ACTION_BOOT_COMPLETED -> CareMonitor.onBoot(app)
+            else -> CareMonitor.schedule(app) // MY_PACKAGE_REPLACED
         }
     }
 }

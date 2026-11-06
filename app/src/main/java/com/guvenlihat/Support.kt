@@ -110,6 +110,7 @@ object Support {
         sb.append("Bildirim yöntemi: ${prefs.notifyMethod.name}\n")
         sb.append("Güvenli kişi sayısı: ${prefs.safeContacts.size}\n")
         sb.append("Sesli okuma: ${yesNo(prefs.announceCaller)}\n")
+        sb.append("Yardım düğmesi: ${yesNo(prefs.helpButtonEnabled)}, düşük pil: ${yesNo(prefs.lowBatteryAlert)}, açılış: ${yesNo(prefs.bootAlert)}\n")
         sb.append("Hareketsizlik uyarısı: ${if (prefs.inactivityHours > 0) "${prefs.inactivityHours} saat" else "kapalı"} (uyku ${prefs.sleepStart}-${prefs.sleepEnd})\n")
         sb.append("Kullanım erişimi: ${yesNo(CareMonitor.hasUsageAccess(act))}\n")
         val locMode = if (prefs.locationAtTimes) "saatler: ${prefs.locationTimes.joinToString(",")}" else "${prefs.locationIntervalHours} saatte bir, ${prefs.locationStart}-${prefs.locationEnd}"

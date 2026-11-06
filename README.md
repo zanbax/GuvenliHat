@@ -20,6 +20,9 @@ Yaşlıları telefon dolandırıcılığından korumak için Android uygulaması
 | **Yakınlarım** | Ana ekranda önce güvenli kişiler (yeşil çerçeve), sonra son 2 ayda en sık konuşulan rehber kişileri; en fazla 6 kart. Rehberde fotoğraf varsa fotoğraf, yoksa baş harf rozeti. Rehber, Son Aramalar ve Tuşla alt tarafta her zaman görünür. |
 | **Sesli okuma** | Ayarlardan açılırsa gelen aramada "Ayşe arıyor" diye okur; rehberde olmayan numarada "Dikkat" der. Telefon sessizdeyken okumaz. |
 | **Renkler** | Kırmızı sadece rehberde olmayan (şüpheli) aramalar için kullanılır. Yumuşak, göz yormayan ama okunaklı palet. |
+| **Yardım düğmesi** | Ana ekranda kırmızı "Yardım" kartı; 3 saniye basılı tutulunca güvenli kişiler sırayla aranır, hepsine konumlu "Yardım istedi" mesajı gider. Yanlışlıkla basılırsa ana ekrandan iptal edilir. |
+| **Düşük pil uyarısı** | Pil %15'in altına düşüp şarja takılmadıysa aileye haber gider. |
+| **Yeniden açılma bildirimi** | Telefon kapanıp açılınca aileye haber gider (en son ne zaman çalıştığıyla birlikte). |
 | **Hareketsizlik uyarısı** (isteğe bağlı) | Telefon 6/12/24 saat hiç kullanılmazsa (ekran, uygulama, arama) güvenli kişilere son konum ve pil bilgisiyle haber gider. Uyku saatleri sayılmaz. |
 | **Aralıklı konum** (isteğe bağlı) | Ya belirli aralıklarla (1/2/3/6 saatte bir, seçilen saatler arasında) ya da belirli saatlerde (örn. 14:00 ve 17:00) konum (harita linki) ve pil bilgisi gönderilir. Her gönderimde korunan kişinin telefonunda sessiz bir "Konumunuz yakınlarınıza gönderildi" bildirimi çıkar. |
 | **PIN koruması** | Ayarlar aile PIN'i olmadan açılamaz. |

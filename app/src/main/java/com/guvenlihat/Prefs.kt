@@ -72,6 +72,32 @@ class Prefs(context: Context) {
         get() = sp.getLong("last_emergency", 0L)
         set(value) = sp.edit().putLong("last_emergency", value).apply()
 
+    // ---------- Güvenlik uyarıları ----------
+
+    var helpButtonEnabled: Boolean
+        get() = sp.getBoolean("help_button", true)
+        set(value) = sp.edit().putBoolean("help_button", value).apply()
+
+    var helpSentAt: Long
+        get() = sp.getLong("help_sent_at", 0L)
+        set(value) = sp.edit().putLong("help_sent_at", value).apply()
+
+    var lowBatteryAlert: Boolean
+        get() = sp.getBoolean("low_battery_alert", true)
+        set(value) = sp.edit().putBoolean("low_battery_alert", value).apply()
+
+    var lowBatteryAlerted: Boolean
+        get() = sp.getBoolean("low_battery_alerted", false)
+        set(value) = sp.edit().putBoolean("low_battery_alerted", value).apply()
+
+    var bootAlert: Boolean
+        get() = sp.getBoolean("boot_alert", true)
+        set(value) = sp.edit().putBoolean("boot_alert", value).apply()
+
+    var lastTickAt: Long
+        get() = sp.getLong("last_tick_at", 0L)
+        set(value) = sp.edit().putLong("last_tick_at", value).apply()
+
     // ---------- Bakım modülü: hareketsizlik ve konum ----------
 
     /** 0 = kapalı */

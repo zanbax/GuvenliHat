@@ -369,6 +369,26 @@ class SettingsActivity : Activity() {
             smallButton("Deneme mesajı gönder", Ui.GREEN) { sendTest() }
         }
 
+        // Güvenlik uyarıları
+        section("Yardım düğmesi ve uyarılar")
+        fun switchRow(text: String, value: Boolean, onChange: (Boolean) -> Unit) {
+            @Suppress("DEPRECATION")
+            val sw = Switch(this)
+            sw.text = text
+            sw.textSize = 20f
+            sw.isChecked = value
+            sw.setPadding(0, Ui.dp(this, 6), 0, Ui.dp(this, 6))
+            sw.setOnCheckedChangeListener { _, c -> onChange(c) }
+            root.addView(sw)
+        }
+        switchRow("Ana ekranda Yardım düğmesi", prefs.helpButtonEnabled) { prefs.helpButtonEnabled = it }
+        note("3 saniye basılı tutulunca güvenli kişiler sırayla aranır, hepsine konumlu \"Yardım istedi\" mesajı gider. Yanlışlıkla basılırsa ana ekrandan iptal edilebilir.")
+        switchRow("Düşük pil uyarısı (%15)", prefs.lowBatteryAlert) {
+            prefs.lowBatteryAlert = it
+            CareMonitor.schedule(this)
+        }
+        switchRow("Telefon yeniden açılınca haber ver", prefs.bootAlert) { prefs.bootAlert = it }
+
         // Bakım: hareketsizlik ve konum (isteğe bağlı, varsayılanda kapalı)
         section("Bakım: hareketsizlik ve konum")
         note("İsteğe bağlıdır. Açmadan önce korunan kişiye anlatın ve onayını alın.")

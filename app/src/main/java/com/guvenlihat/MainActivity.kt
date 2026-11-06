@@ -7,7 +7,12 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.provider.CallLog
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.ValueAnimator
 import android.graphics.Color
+import android.os.Build
+import android.view.MotionEvent
 import android.graphics.drawable.GradientDrawable
 import android.view.Gravity
 import android.view.View
@@ -121,6 +126,21 @@ class MainActivity : Activity() {
     private fun buildContent() {
         content.removeAllViews()
         val prefs = Prefs(this)
+
+        // Yardım düğmesi ve "yanlışlıkla bastım" seçeneği
+        if (prefs.helpButtonEnabled) {
+            val since = System.currentTimeMillis() - prefs.helpSentAt
+            if (since in 0 until 10 * 60_000L) {
+                val box = Ui.label(this, "🆘 Yardım çağrısı gönderildi.\nYakınlarınıza haber verildi.", 20f, Ui.RED_DARK, bold = true)
+                val p = Ui.dp(this, 14)
+                box.setPadding(p, p, p, p)
+                box.background = Ui.cardBackground(this, Ui.RED_TINT, Ui.RED, 2)
+                content.addView(box)
+                content.addView(Ui.button(this, "Yanlışlıkla bastım, sorun yok", Ui.GRAY, 20f) { cancelHelp() })
+            } else {
+                content.addView(helpButton())
+            }
+        }
 
         if (CallManager.hasCalls()) {
             content.addView(Ui.button(this, "Görüşmeye Dön", Ui.GREEN, 26f) {
@@ -252,6 +272,140 @@ class MainActivity : Activity() {
             setMargins(m, m, m, m)
         }
         return card
+    }
+
+    // ---------------- Yardım (SOS) ----------------
+
+    /**
+     * Sevimli ama dikkat çekici kırmızı kart: beyaz dairede kalp, büyük "Yardım" yazısı.
+     * Yanlışlıkla basılmasın diye 3 saniye basılı tutulur; bu sırada kart soldan sağa dolar.
+     */
+    @android.annotation.SuppressLint("ClickableViewAccessibility")
+    private fun helpButton(): View {
+        val frame = FrameLayout(this)
+        val m = Ui.dp(this, 2)
+        frame.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, Ui.dp(this, 96)).apply {
+            setMargins(0, Ui.dp(this@MainActivity, 6), 0, Ui.dp(this@MainActivity, 6))
+        }
+        frame.background = GradientDrawable().apply {
+            setColor(Ui.RED)
+            cornerRadius = Ui.dp(this@MainActivity, 20).toFloat()
+        }
+        frame.clipToOutline = true
+
+        // Basılı tutarken dolan koyu katman
+        val fill = View(this)
+        fill.setBackgroundColor(Ui.RED_DARK)
+        frame.addView(fill, FrameLayout.LayoutParams(0, FrameLayout.LayoutParams.MATCH_PARENT))
+
+        val row = LinearLayout(this)
+        row.orientation = LinearLayout.HORIZONTAL
+        row.gravity = Gravity.CENTER_VERTICAL
+        val p = Ui.dp(this, 16)
+        row.setPadding(p, 0, p, 0)
+
+        val circle = FrameLayout(this)
+        circle.background = GradientDrawable().apply {
+            shape = GradientDrawable.OVAL
+            setColor(Color.WHITE)
+        }
+        val heart = ImageView(this)
+        heart.setImageResource(R.drawable.ic_heart)
+        heart.setColorFilter(Ui.RED)
+        val hs = Ui.dp(this, 34)
+        circle.addView(heart, FrameLayout.LayoutParams(hs, hs, Gravity.CENTER))
+        val cs = Ui.dp(this, 62)
+        row.addView(circle, LinearLayout.LayoutParams(cs, cs).apply { rightMargin = Ui.dp(this@MainActivity, 16) })
+
+        val texts = LinearLayout(this)
+        texts.orientation = LinearLayout.VERTICAL
+        val title = Ui.label(this, "Yardım", 30f, Color.WHITE, bold = true)
+        title.setPadding(0, 0, 0, 0)
+        val hint = Ui.label(this, "3 saniye basılı tutun", 17f, Color.WHITE)
+        hint.setPadding(0, 0, 0, 0)
+        texts.addView(title)
+        texts.addView(hint)
+        row.addView(texts)
+        frame.addView(row, FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT))
+
+        var animator: ValueAnimator? = null
+        frame.setOnTouchListener { v, ev ->
+            when (ev.actionMasked) {
+                MotionEvent.ACTION_DOWN -> {
+                    animator?.cancel()
+                    animator = ValueAnimator.ofFloat(0f, 1f).apply {
+                        duration = 3000
+                        addUpdateListener { a ->
+                            val f = a.animatedValue as Float
+                            fill.layoutParams = fill.layoutParams.apply { width = (v.width * f).toInt() }
+                            fill.requestLayout()
+                            val left = 3 - (f * 3).toInt()
+                            hint.text = if (left > 0) "Bırakmayın... $left" else "Gönderiliyor"
+                        }
+                        addListener(object : AnimatorListenerAdapter() {
+                            private var cancelled = false
+                            override fun onAnimationCancel(animation: Animator) {
+                                cancelled = true
+                            }
+                            override fun onAnimationEnd(animation: Animator) {
+                                if (!cancelled) triggerHelp()
+                            }
+                        })
+                        start()
+                    }
+                    true
+                }
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    val done = animator?.isRunning == false
+                    animator?.cancel()
+                    if (!done) {
+                        fill.layoutParams = fill.layoutParams.apply { width = 0 }
+                        fill.requestLayout()
+                        hint.text = "3 saniye basılı tutun"
+                    }
+                    true
+                }
+                else -> true
+            }
+        }
+        frame.contentDescription = "Yardım düğmesi. Yardım çağırmak için 3 saniye basılı tutun."
+        return frame
+    }
+
+    private fun triggerHelp() {
+        val prefs = Prefs(this)
+        prefs.helpSentAt = System.currentTimeMillis()
+        try {
+            @Suppress("DEPRECATION")
+            val vib = getSystemService(android.os.Vibrator::class.java)
+            if (Build.VERSION.SDK_INT >= 26) {
+                vib?.vibrate(android.os.VibrationEffect.createOneShot(400, android.os.VibrationEffect.DEFAULT_AMPLITUDE))
+            } else {
+                @Suppress("DEPRECATION")
+                vib?.vibrate(400)
+            }
+        } catch (e: Exception) {
+        }
+        val first = prefs.safeContacts.firstOrNull()
+        Notifier.send(
+            this,
+            "🆘 YARDIM İSTEDİ! Telefonundaki Yardım düğmesine bastı." +
+                (if (first != null) " ${first.name} aranıyor." else "") + " Konum birkaç saniye içinde gelecek.",
+        )
+        val app = applicationContext
+        CareMonitor.getLocation(app) { loc ->
+            Notifier.send(app, "🆘 Yardım isteyenin konumu: " + CareMonitor.locationText(loc) + " " + CareMonitor.batteryText(app))
+        }
+        CallManager.startHelp(this)
+        build()
+    }
+
+    private fun cancelHelp() {
+        val prefs = Prefs(this)
+        prefs.helpSentAt = 0L
+        CallManager.cancelHelp()
+        Notifier.send(this, "✓ Yardım düğmesine yanlışlıkla basılmış, sorun yok.")
+        build()
     }
 
     // ---------------- Alt menü (her zaman görünür) ----------------

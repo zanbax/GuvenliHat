@@ -55,6 +55,9 @@ object CallManager {
         private set
 
     private var chainActive = false
+
+    /** Zincir "Yardım" düğmesiyle mi başladı (yoksa süre sınırıyla mı)? */
+    private var chainForHelp = false
     private var chainIndex = 0
     private var wakeLock: PowerManager.WakeLock? = null
 
@@ -249,6 +252,7 @@ object CallManager {
 
         if (info != null) {
             if (info.cutByLimit) {
+                chainForHelp = false
                 main.postDelayed({ startChain() }, 1500)
             } else if (info.fromChain && !info.wasActive && chainActive) {
                 chainIndex++
@@ -269,6 +273,7 @@ object CallManager {
                 if (info.fromChain) {
                     // Güvenli kişi açtı, zincir tamam
                     chainActive = false
+                    chainForHelp = false
                     banner = null
                 }
                 if (info.limited) startLimitTimer(call, info)
@@ -329,10 +334,32 @@ object CallManager {
 
     // ---------- Güvenli kişileri sırayla arama ----------
 
+    /** "Yardım" düğmesi: güvenli kişileri sırayla arar (mesajlar MainActivity'den gider). */
+    fun startHelp(ctx: Context) {
+        app = ctx.applicationContext
+        chainForHelp = true
+        startChain()
+    }
+
+    fun cancelHelp() {
+        if (chainForHelp) {
+            chainActive = false
+            chainForHelp = false
+            banner = null
+            calls.firstOrNull { infos[it]?.fromChain == true }?.disconnect()
+            notifyUi()
+        }
+    }
+
     private fun startChain() {
         val contacts = Prefs(app).safeContacts
         if (contacts.isEmpty()) {
-            banner = "Bu konuşma güvenliğiniz için sonlandırıldı.\nLütfen bir yakınınızı arayın."
+            banner = if (chainForHelp) {
+                "Güvenli kişi eklenmemiş.\nAcil bir durumsa 112'yi arayın."
+            } else {
+                "Bu konuşma güvenliğiniz için sonlandırıldı.\nLütfen bir yakınınızı arayın."
+            }
+            chainForHelp = false
             notifyUi()
             showUi(app)
             return
@@ -348,13 +375,25 @@ object CallManager {
         if (chainIndex >= contacts.size) {
             chainActive = false
             banner = "Yakınlarınıza şu an ulaşılamadı.\nOnlara haber verildi, sizi arayacaklar."
-            Notifier.send(app, "Görüşme kesildikten sonra yakınlarına telefonla ulaşılamadı. Lütfen hemen arayın!")
+            Notifier.send(
+                app,
+                if (chainForHelp) {
+                    "🆘 Yardım çağrısından sonra telefonla ulaşılamadı. Lütfen HEMEN arayın!"
+                } else {
+                    "Görüşme kesildikten sonra yakınlarına telefonla ulaşılamadı. Lütfen hemen arayın!"
+                },
+            )
+            chainForHelp = false
             notifyUi()
             showUi(app)
             return
         }
         val c = contacts[chainIndex]
-        banner = "Bu konuşma güvenliğiniz için sonlandırıldı.\n${c.name} aranıyor..."
+        banner = if (chainForHelp) {
+            "Yardım çağrısı gönderildi.\n${c.name} aranıyor..."
+        } else {
+            "Bu konuşma güvenliğiniz için sonlandırıldı.\n${c.name} aranıyor..."
+        }
         notifyUi()
         showUi(app)
         PhoneUtils.placeCall(app, c.number, autoSim = true)
@@ -387,7 +426,10 @@ object CallManager {
 
     fun hangup() {
         val c = primaryCall() ?: return
-        if (infos[c]?.fromChain == true) chainActive = false
+        if (infos[c]?.fromChain == true) {
+            chainActive = false
+            chainForHelp = false
+        }
         if (stateOf(c) == Call.STATE_RINGING) {
             infos[c]?.rejectedByUser = true
             c.reject(false, null)
