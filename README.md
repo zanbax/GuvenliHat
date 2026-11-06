@@ -41,6 +41,7 @@ Android Studio'yu kurun, **Open** ile bu klasörü açın, **Build → Build APK
 1. APK'yı telefona atın (WhatsApp'tan kendinize göndermek kolay olur) ve açın. "Bilinmeyen kaynaklardan yüklemeye izin ver" sorusuna izin verin.
    - Xiaomi "güvenlik taraması" uyarısı gösterebilir. Uygulamayı kendiniz derlediğiniz için devam edebilirsiniz.
 2. Güvenli Hat'ı açın, **Ayarlar (aile için)** düğmesine basın ve bir **aile PIN'i** belirleyin.
+   - Android 13 ve üstünde "Erişim reddedildi" uyarısı çıkarsa: uygulama simgesine basılı tutun → **Uygulama bilgisi** → sağ üstteki **⋮** → **Kısıtlanmış ayarlara izin ver**. Sonra tekrar deneyin.
 3. **1. Kurulum** bölümündeki kırmızı ✗ işaretlerinin hepsini yeşile çevirin:
    - Varsayılan telefon uygulaması (en önemlisi)
    - İzinler
