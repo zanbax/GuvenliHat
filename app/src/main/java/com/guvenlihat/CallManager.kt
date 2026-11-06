@@ -136,6 +136,7 @@ object CallManager {
             state == Call.STATE_RINGING
         }
         val emergency = PhoneUtils.isEmergency(number)
+        if (incoming) CareMonitor.markSystemWake(app)
         if (!incoming && emergency) prefs.lastEmergencyCallAt = System.currentTimeMillis()
 
         // 1) Gelen arama: süzgeç servisi çalışmadıysa burada yedek olarak engelle
@@ -234,6 +235,7 @@ object CallManager {
         val info = infos.remove(call)
         if (infos.values.none { it.limited && it.wasActive }) releaseWakeLock()
 
+        if (info != null && info.incoming && !info.wasActive) CareMonitor.markSystemWake(app)
         if (info != null && info.incoming && !info.wasActive && !info.rejectedByUser) {
             val cause = try {
                 call.details.disconnectCause?.code

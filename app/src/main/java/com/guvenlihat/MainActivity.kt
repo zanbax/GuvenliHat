@@ -113,10 +113,7 @@ class MainActivity : Activity() {
         if (!ok) {
             header.addView(Ui.label(this, "Ailenizden yardım isteyin.", 17f, Ui.RED))
         }
-        // Şeffaflık: konum paylaşılıyorsa korunan kişi bunu her zaman görsün
-        if (Prefs(this).locationEnabled) {
-            header.addView(Ui.label(this, "📍 Konumunuz ailenizle paylaşılıyor", 16f, Ui.SECONDARY))
-        }
+
     }
 
     // ---------------- Orta kısım ----------------

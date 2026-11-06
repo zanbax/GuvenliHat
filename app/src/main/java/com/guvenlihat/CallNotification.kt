@@ -17,6 +17,7 @@ object CallNotification {
     private const val CH_INCOMING = "incoming_v2"
     private const val CH_ONGOING = "ongoing_v2"
     const val CH_MISSED = "missed_v1"
+    const val CH_CARE = "care_v1"
     private const val ID = 1001
     private const val FLAGS = PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
 
@@ -35,7 +36,12 @@ object CallNotification {
         val missed = NotificationChannel(CH_MISSED, "Cevapsız aramalar", NotificationManager.IMPORTANCE_DEFAULT).apply {
             setShowBadge(true)
         }
-        nm.createNotificationChannels(listOf(incoming, ongoing, missed))
+        val care = NotificationChannel(CH_CARE, "Konum paylaşımı bilgisi", NotificationManager.IMPORTANCE_LOW).apply {
+            setShowBadge(false)
+            setSound(null, null)
+            enableVibration(false)
+        }
+        nm.createNotificationChannels(listOf(incoming, ongoing, missed, care))
         for (old in listOf("incoming_v1", "ongoing_v1")) {
             try {
                 nm.deleteNotificationChannel(old)
@@ -103,6 +109,7 @@ object MissedCalls {
     private const val ID = 1002
 
     fun add(ctx: Context, name: String) {
+        CareMonitor.markSystemWake(ctx)
         val prefs = Prefs(ctx)
         prefs.missedCount = prefs.missedCount + 1
         prefs.missedLastName = name

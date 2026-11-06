@@ -95,6 +95,21 @@ class Prefs(context: Context) {
         get() = sp.getLong("last_activity_at", 0L)
         set(value) = sp.edit().putLong("last_activity_at", value).apply()
 
+    /** Telefonun kullanıcı dokunmadan uyandığı anlar (gelen arama, kendi bildirimlerimiz). */
+    @Synchronized
+    fun addSystemWake(time: Long) {
+        val arr = try { JSONArray(sp.getString("system_wakes", "[]")) } catch (e: Exception) { JSONArray() }
+        val list = (0 until arr.length()).map { arr.optLong(it) }.filter { time - it < 3 * 24 * 60 * 60_000L } + time
+        val out = JSONArray()
+        list.takeLast(60).forEach { out.put(it) }
+        sp.edit().putString("system_wakes", out.toString()).apply()
+    }
+
+    fun systemWakes(): List<Long> {
+        val arr = try { JSONArray(sp.getString("system_wakes", "[]")) } catch (e: Exception) { JSONArray() }
+        return (0 until arr.length()).map { arr.optLong(it) }
+    }
+
     var locationEnabled: Boolean
         get() = sp.getBoolean("location_enabled", false)
         set(value) = sp.edit().putBoolean("location_enabled", value).apply()

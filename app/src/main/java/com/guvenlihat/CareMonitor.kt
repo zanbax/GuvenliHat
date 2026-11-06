@@ -90,6 +90,7 @@ object CareMonitor {
                 prefs.lastLocationSentAt = now
                 val time = SimpleDateFormat("HH:mm", Locale("tr")).format(Date(now))
                 Notifier.send(ctx, "📍 Konum ($time): $extra")
+                showSharedNotice(ctx, time)
             }
             done()
         }
@@ -132,9 +133,13 @@ object CareMonitor {
                 val from = maxOf(last, now - 3 * 24 * HOUR)
                 val events = usm?.queryEvents(from, now)
                 val e = UsageEvents.Event()
+                val wakes = prefs.systemWakes()
                 while (events != null && events.hasNextEvent()) {
                     events.getNextEvent(e)
-                    if (isUserEvent(e.eventType)) last = maxOf(last, e.timeStamp)
+                    if (!isUserEvent(e.eventType)) continue
+                    // Sadece ekranın yanması, gelen arama ya da kendi bildirimimiz yüzünden olduysa sayma
+                    if (isScreenOnOnly(e.eventType) && wakes.any { e.timeStamp - it in -5_000L..120_000L }) continue
+                    last = maxOf(last, e.timeStamp)
                 }
             } catch (ex: Exception) {
             }
@@ -171,6 +176,14 @@ object CareMonitor {
             (type == UsageEvents.Event.SCREEN_INTERACTIVE || type == UsageEvents.Event.KEYGUARD_HIDDEN)
         ) return true
         return false
+    }
+
+    private fun isScreenOnOnly(type: Int): Boolean =
+        Build.VERSION.SDK_INT >= 28 && type == UsageEvents.Event.SCREEN_INTERACTIVE
+
+    /** Kullanıcı dokunmadan telefonun uyanabileceği bir an (hareketsizlik hesabında yok sayılır). */
+    fun markSystemWake(ctx: Context) {
+        Prefs(ctx).addSystemWake(System.currentTimeMillis())
     }
 
     @Suppress("DEPRECATION")
@@ -292,6 +305,35 @@ object CareMonitor {
         }
     }
 
+    /**
+     * Şeffaflık: konum her gönderildiğinde korunan kişinin telefonunda sessiz bir bildirim.
+     * Ses, titreşim yok, ekranı uyandırmaz; yenisi eskisinin yerine geçer.
+     */
+    @Suppress("DEPRECATION")
+    private fun showSharedNotice(ctx: Context, time: String) {
+        val nm = ctx.getSystemService(android.app.NotificationManager::class.java) ?: return
+        markSystemWake(ctx)
+        val open = PendingIntent.getActivity(
+            ctx, 5, Intent(ctx, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
+        val b = if (Build.VERSION.SDK_INT >= 26) {
+            android.app.Notification.Builder(ctx, CallNotification.CH_CARE)
+        } else {
+            android.app.Notification.Builder(ctx).setPriority(android.app.Notification.PRIORITY_LOW)
+        }
+        b.setSmallIcon(R.drawable.ic_location)
+            .setContentTitle("📍 Konumunuz yakınlarınıza gönderildi")
+            .setContentText("Saat $time. Aileniz ayarlardan bunu kapatabilir.")
+            .setOnlyAlertOnce(true)
+            .setAutoCancel(true)
+            .setContentIntent(open)
+        try {
+            nm.notify(1003, b.build())
+        } catch (e: Exception) {
+        }
+    }
+
     fun locationText(loc: Location?): String {
         if (loc == null) return "Konum alınamadı (telefonun konumu kapalı olabilir)."
         val lat = String.format(Locale.US, "%.5f", loc.latitude)
@@ -317,6 +359,7 @@ object CareMonitor {
         val app = ctx.applicationContext
         getLocation(app) { loc ->
             Notifier.send(app, "📍 Konum (elle istendi): " + locationText(loc) + " " + batteryText(app))
+            showSharedNotice(app, SimpleDateFormat("HH:mm", Locale("tr")).format(Date()))
         }
     }
 }

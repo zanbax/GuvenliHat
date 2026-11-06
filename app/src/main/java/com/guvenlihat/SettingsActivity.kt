@@ -422,7 +422,7 @@ class SettingsActivity : Activity() {
         }
         root.addView(loc)
         if (prefs.locationEnabled) {
-            note("Seçilen saatler arasında konum (harita linki) ve pil seviyesi gönderilir. Korunan kişinin ana ekranında \"Konumunuz ailenizle paylaşılıyor\" yazar.")
+            note("Seçilen saatler arasında konum (harita linki) ve pil seviyesi gönderilir. Her gönderimde korunan kişinin telefonunda sessiz bir \"Konumunuz yakınlarınıza gönderildi\" bildirimi çıkar.")
             choice(
                 listOf(1 to "Saatte bir", 2 to "2 saatte bir", 3 to "3 saatte bir", 6 to "6 saatte bir"),
                 prefs.locationIntervalHours,
