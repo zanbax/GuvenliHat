@@ -15,6 +15,12 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+    <!-- Bakım modülü (isteğe bağlı): hareketsizlik uyarısı ve aralıklı konum -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+    <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:name=".App"
@@ -98,6 +104,16 @@
         <receiver
             android:name=".CallActionReceiver"
             android:exported="false" />
+
+        <!-- Bakım modülü: 30 dakikalık kontrol, açılışta ve güncellemede yeniden planlama -->
+        <receiver
+            android:name=".CareReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
 
         <!-- Sistem cevapsız aramaları buraya bildirir; bildirim ve simge sayısını biz gösteririz -->
         <receiver

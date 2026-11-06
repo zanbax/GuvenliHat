@@ -72,6 +72,50 @@ class Prefs(context: Context) {
         get() = sp.getLong("last_emergency", 0L)
         set(value) = sp.edit().putLong("last_emergency", value).apply()
 
+    // ---------- Bakım modülü: hareketsizlik ve konum ----------
+
+    /** 0 = kapalı */
+    var inactivityHours: Int
+        get() = sp.getInt("inactivity_hours", 0)
+        set(value) = sp.edit().putInt("inactivity_hours", value).apply()
+
+    var sleepStart: Int
+        get() = sp.getInt("sleep_start", 22)
+        set(value) = sp.edit().putInt("sleep_start", value).apply()
+
+    var sleepEnd: Int
+        get() = sp.getInt("sleep_end", 8)
+        set(value) = sp.edit().putInt("sleep_end", value).apply()
+
+    var inactivityAlerted: Boolean
+        get() = sp.getBoolean("inactivity_alerted", false)
+        set(value) = sp.edit().putBoolean("inactivity_alerted", value).apply()
+
+    var lastActivityAt: Long
+        get() = sp.getLong("last_activity_at", 0L)
+        set(value) = sp.edit().putLong("last_activity_at", value).apply()
+
+    var locationEnabled: Boolean
+        get() = sp.getBoolean("location_enabled", false)
+        set(value) = sp.edit().putBoolean("location_enabled", value).apply()
+
+    var locationIntervalHours: Int
+        get() = sp.getInt("location_interval", 2)
+        set(value) = sp.edit().putInt("location_interval", value).apply()
+
+    /** start == end: bütün gün */
+    var locationStart: Int
+        get() = sp.getInt("location_start", 9)
+        set(value) = sp.edit().putInt("location_start", value).apply()
+
+    var locationEnd: Int
+        get() = sp.getInt("location_end", 21)
+        set(value) = sp.edit().putInt("location_end", value).apply()
+
+    var lastLocationSentAt: Long
+        get() = sp.getLong("last_location_sent", 0L)
+        set(value) = sp.edit().putLong("last_location_sent", value).apply()
+
     /** Gelen aramada arayanın adını sesli oku */
     var announceCaller: Boolean
         get() = sp.getBoolean("announce_caller", false)

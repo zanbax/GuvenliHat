@@ -53,6 +53,7 @@ class SettingsActivity : Activity() {
 
     override fun onPause() {
         saveFields()
+        CareMonitor.schedule(this)
         super.onPause()
     }
 
@@ -368,6 +369,87 @@ class SettingsActivity : Activity() {
             smallButton("Deneme mesajı gönder", Ui.GREEN) { sendTest() }
         }
 
+        // Bakım: hareketsizlik ve konum (isteğe bağlı, varsayılanda kapalı)
+        section("Bakım: hareketsizlik ve konum")
+        note("İsteğe bağlıdır. Açmadan önce korunan kişiye anlatın ve onayını alın.")
+
+        root.addView(Ui.label(this, "Hareketsizlik uyarısı", 20f, bold = true))
+        note("Telefon bu süre boyunca hiç kullanılmazsa (ekran açılmazsa, arama yapılmazsa) güvenli kişilere son konum ve pil bilgisiyle haber gider. Uyku saatleri sayılmaz, gece kimse uyandırılmaz.")
+        choice(
+            listOf(0 to "Kapalı", 1 to "1 saat (sadece deneme için)", 6 to "6 saat", 12 to "12 saat", 24 to "24 saat"),
+            prefs.inactivityHours,
+        ) {
+            if (prefs.inactivityHours == 0 && it > 0) {
+                CareMonitor.markActive(this)
+                prefs.inactivityAlerted = false
+            }
+            prefs.inactivityHours = it
+            CareMonitor.schedule(this)
+            root.post { build() }
+        }
+        if (prefs.inactivityHours > 0) {
+            smallButton("Uyku saatleri: ${hourRange(prefs.sleepStart, prefs.sleepEnd, "yok")}  (değiştir)", Ui.GRAY) {
+                pickHours("Uyku saatleri", listOf(21 to 7, 22 to 7, 22 to 8, 23 to 8, 23 to 9), "Uyku saati yok") { st, en ->
+                    prefs.sleepStart = st
+                    prefs.sleepEnd = en
+                    build()
+                }
+            }
+            statusRow("Telefon kullanımını görme izni", CareMonitor.hasUsageAccess(this), "İzin ver (Kullanım erişimi)") {
+                Setup.openUsageAccess(this)
+            }
+            if (!CareMonitor.hasUsageAccess(this)) {
+                note("Açılan listede Güvenli Hat'ı bulup izni açın. Bu izin olmadan sadece aramalar ve Güvenli Hat'ın açılması \"kullanım\" sayılır.")
+            }
+        }
+
+        root.addView(Ui.label(this, "Aralıklı konum paylaşımı", 20f, bold = true))
+        @Suppress("DEPRECATION")
+        val loc = Switch(this)
+        loc.text = "Konumu belirli aralıklarla güvenli kişilere gönder"
+        loc.textSize = 20f
+        loc.isChecked = prefs.locationEnabled
+        loc.setOnCheckedChangeListener { _, checked ->
+            prefs.locationEnabled = checked
+            if (checked) prefs.lastLocationSentAt = 0L
+            CareMonitor.schedule(this)
+            if (checked && !CareMonitor.hasLocationPermission(this)) {
+                requestPermissions(
+                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION), RC_PERMS,
+                )
+            }
+            root.post { build() }
+        }
+        root.addView(loc)
+        if (prefs.locationEnabled) {
+            note("Seçilen saatler arasında konum (harita linki) ve pil seviyesi gönderilir. Korunan kişinin ana ekranında \"Konumunuz ailenizle paylaşılıyor\" yazar.")
+            choice(
+                listOf(1 to "Saatte bir", 2 to "2 saatte bir", 3 to "3 saatte bir", 6 to "6 saatte bir"),
+                prefs.locationIntervalHours,
+            ) { prefs.locationIntervalHours = it }
+            smallButton("Gönderim saatleri: ${hourRange(prefs.locationStart, prefs.locationEnd, "bütün gün")}  (değiştir)", Ui.GRAY) {
+                pickHours("Gönderim saatleri", listOf(8 to 20, 9 to 21, 7 to 22), "Bütün gün") { st, en ->
+                    prefs.locationStart = st
+                    prefs.locationEnd = en
+                    build()
+                }
+            }
+            statusRow("Konum izni", CareMonitor.hasLocationPermission(this), "İzin ver") {
+                requestPermissions(
+                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION), RC_PERMS,
+                )
+            }
+            if (CareMonitor.hasLocationPermission(this)) {
+                statusRow("Konuma arka planda erişim (\"Her zaman izin ver\")", CareMonitor.hasBackgroundLocation(this), "Her zaman izin ver") {
+                    requestBackgroundLocation()
+                }
+            }
+            smallButton("Konumu şimdi gönder (deneme)", Ui.GREEN) {
+                CareMonitor.sendLocationNow(this)
+                toast("Konum alınıyor ve gönderiliyor...")
+            }
+        }
+
         // Destek (deneme sürecinde testçiler için)
         section("Destek")
         note("Bir sorun olursa ya da görüşünüzü iletmek isterseniz: telefon bilgisi ve son olaylar otomatik eklenir, telefon numaraları gizlenir. Göndermeden önce içeriği görebilirsiniz. Destek adresi: " + Support.EMAIL)
@@ -389,6 +471,28 @@ class SettingsActivity : Activity() {
             saveFields()
             finish()
         })
+    }
+
+    private fun hourRange(start: Int, end: Int, none: String): String =
+        if (start == end) none else String.format(java.util.Locale.US, "%02d:00 – %02d:00", start, end)
+
+    private fun pickHours(title: String, options: List<Pair<Int, Int>>, noneLabel: String, onPick: (Int, Int) -> Unit) {
+        val items = options.map { (st, en) ->
+            Triple<String, Int, () -> Unit>(hourRange(st, en, noneLabel), Ui.BLUE) { onPick(st, en) }
+        } + Triple<String, Int, () -> Unit>(noneLabel, Ui.GRAY) { onPick(0, 0) }
+        Ui.actions(this, title, items)
+    }
+
+    private fun requestBackgroundLocation() {
+        if (Build.VERSION.SDK_INT < 29) return
+        if (Build.VERSION.SDK_INT >= 30) {
+            toast("Açılan ekranda \"Her zaman izin ver\" seçeneğini seçin")
+        }
+        try {
+            requestPermissions(arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION), RC_PERMS)
+        } catch (e: Exception) {
+            Setup.openAppDetails(this)
+        }
     }
 
     private fun addSafeManually() {

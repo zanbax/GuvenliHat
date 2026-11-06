@@ -260,6 +260,7 @@ object CallManager {
         val info = infos[call] ?: return
         when (state) {
             Call.STATE_ACTIVE -> if (!info.wasActive) {
+                CareMonitor.markActive(app)
                 if (info.incoming) CallerAnnouncer.stop()
                 info.wasActive = true
                 info.activeSince = SystemClock.elapsedRealtime()

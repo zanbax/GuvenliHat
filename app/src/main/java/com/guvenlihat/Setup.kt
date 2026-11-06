@@ -64,6 +64,7 @@ object Setup {
         )
         if (Build.VERSION.SDK_INT >= 33) list.add(Manifest.permission.POST_NOTIFICATIONS)
         if (prefs.notifyMethod.usesSms) list.add(Manifest.permission.SEND_SMS)
+        if (prefs.locationEnabled) list.add(Manifest.permission.ACCESS_FINE_LOCATION)
         return list
     }
 
@@ -118,6 +119,10 @@ object Setup {
             Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + act.packageName))
         }
         if (!tryStart(act, i)) openAppDetails(act)
+    }
+
+    fun openUsageAccess(act: Activity) {
+        if (!tryStart(act, Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))) openAppDetails(act)
     }
 
     fun openDefaultApps(act: Activity) {

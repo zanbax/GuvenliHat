@@ -12,8 +12,8 @@ android {
         minSdk = 24
         // 34: Android 15'in zorunlu kenardan kenara ekran düzenine girmemek için
         targetSdk = 34
-        versionCode = 9
-        versionName = "0.6.2"
+        versionCode = 10
+        versionName = "0.7.0"
     }
 
     // Sabit imza anahtarı: her yeni APK eskisinin üzerine güncelleme olarak kurulabilsin.

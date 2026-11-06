@@ -18,6 +18,7 @@ class App : Application() {
         ContactsWatcher.checkInBackground(this)
         // Sesli okuma açıksa metin okuma motorunu önceden hazırla (ilk aramada gecikmesin)
         if (Prefs(this).announceCaller) CallerAnnouncer.init(this)
+        CareMonitor.schedule(this)
     }
 }
 
