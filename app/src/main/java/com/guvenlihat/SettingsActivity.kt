@@ -135,7 +135,13 @@ class SettingsActivity : Activity() {
         root.addView(Ui.label(this, title, 24f, Ui.GREEN, bold = true))
     }
 
-    private fun note(text: String) = root.addView(Ui.label(this, text, 17f, Ui.GRAY))
+    /** Açıklama metni: sola yaslı, satır aralığı biraz açık (daha rahat okunur). */
+    private fun note(text: String) {
+        val t = Ui.label(this, text, 17f, Ui.SECONDARY)
+        t.setLineSpacing(0f, 1.2f)
+        t.setPadding(0, Ui.dp(this, 4), 0, Ui.dp(this, 8))
+        root.addView(t)
+    }
 
     private fun statusRow(title: String, ok: Boolean, buttonText: String, onFix: () -> Unit) {
         root.addView(Ui.label(this, (if (ok) "✓ " else "✗ ") + title, 20f, if (ok) Ui.GREEN else Ui.RED, bold = true))

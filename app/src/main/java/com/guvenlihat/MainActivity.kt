@@ -7,8 +7,12 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.provider.CallLog
+import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.view.Gravity
 import android.view.View
+import android.widget.FrameLayout
+import android.widget.ImageView
 import android.widget.LinearLayout
 
 /**
@@ -253,16 +257,83 @@ class MainActivity : Activity() {
     private fun buildBottomBar() {
         bottomBar.removeAllViews()
         val missed = Prefs(this).missedCount
-        bottomBar.addView(Ui.weighted(Ui.button(this, "📖\nRehber", Ui.BLUE, 18f) {
-            startActivity(Intent(this, ContactsActivity::class.java))
-        }, marginDp = 3))
-        val recentsText = if (missed > 0) "🕘 $missed Cevapsız\nSon Aramalar" else "🕘\nSon Aramalar"
-        bottomBar.addView(Ui.weighted(Ui.button(this, recentsText, if (missed > 0) Ui.ORANGE else Ui.BLUE, 18f) {
-            startActivity(Intent(this, RecentsActivity::class.java))
-        }, marginDp = 3))
-        bottomBar.addView(Ui.weighted(Ui.button(this, "☎\nTuşla", Ui.BLUE, 18f) {
-            startActivity(Intent(this, DialpadActivity::class.java))
-        }, marginDp = 3))
+        // Her düğmenin kendi yumuşak rengi var: yaşlılar rengiyle de hatırlasın
+        bottomBar.addView(
+            navTile(R.drawable.ic_nav_contacts, "Rehber", Ui.BLUE_TINT, Ui.BLUE, 0) {
+                startActivity(Intent(this, ContactsActivity::class.java))
+            },
+        )
+        bottomBar.addView(
+            navTile(R.drawable.ic_nav_history, "Aramalar", Ui.PURPLE_TINT, Ui.PURPLE, missed) {
+                startActivity(Intent(this, RecentsActivity::class.java))
+            },
+        )
+        bottomBar.addView(
+            navTile(R.drawable.ic_nav_dialpad, "Tuşla", Ui.AMBER_TINT, Ui.AMBER, 0) {
+                startActivity(Intent(this, DialpadActivity::class.java))
+            },
+        )
+    }
+
+    /** Alt menü kartı: renkli daire içinde ikon, altında kısa ad, gerekirse köşede sayı rozeti. */
+    private fun navTile(icon: Int, label: String, tint: Int, color: Int, badge: Int, onClick: () -> Unit): View {
+        val frame = FrameLayout(this)
+        val m = Ui.dp(this, 4)
+        frame.layoutParams = LinearLayout.LayoutParams(0, Ui.dp(this, 104), 1f).apply { setMargins(m, m, m, m) }
+        frame.background = if (badge > 0) {
+            Ui.cardBackground(this, Ui.CARD, Ui.ORANGE, 2)
+        } else {
+            Ui.cardBackground(this, Ui.CARD, Ui.BORDER, 1)
+        }
+        frame.isClickable = true
+        frame.setOnClickListener { onClick() }
+
+        val col = LinearLayout(this)
+        col.orientation = LinearLayout.VERTICAL
+        col.gravity = Gravity.CENTER
+
+        val circle = FrameLayout(this)
+        circle.background = GradientDrawable().apply {
+            shape = GradientDrawable.OVAL
+            setColor(tint)
+        }
+        val circleSize = Ui.dp(this, 54)
+        val iv = ImageView(this)
+        iv.setImageResource(icon)
+        iv.setColorFilter(color)
+        val iconSize = Ui.dp(this, 32)
+        circle.addView(iv, FrameLayout.LayoutParams(iconSize, iconSize, Gravity.CENTER))
+        col.addView(circle, LinearLayout.LayoutParams(circleSize, circleSize))
+
+        val text = Ui.label(this, label, 18f, Ui.TEXT, bold = true)
+        text.setPadding(0, Ui.dp(this, 4), 0, 0)
+        text.gravity = Gravity.CENTER
+        text.maxLines = 1
+        col.addView(text)
+        frame.addView(
+            col,
+            FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT, Gravity.CENTER,
+            ),
+        )
+
+        if (badge > 0) {
+            val b = Ui.label(this, if (badge > 9) "9+" else badge.toString(), 15f, Color.WHITE, bold = true)
+            b.gravity = Gravity.CENTER
+            b.setPadding(0, 0, 0, 0)
+            b.background = GradientDrawable().apply {
+                shape = GradientDrawable.OVAL
+                setColor(Ui.ORANGE)
+            }
+            val bs = Ui.dp(this, 28)
+            frame.addView(
+                b,
+                FrameLayout.LayoutParams(bs, bs, Gravity.TOP or Gravity.END).apply {
+                    setMargins(0, Ui.dp(this@MainActivity, 6), Ui.dp(this@MainActivity, 6), 0)
+                },
+            )
+        }
+        return frame
     }
 
     private fun askRelax() {

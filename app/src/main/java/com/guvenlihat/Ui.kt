@@ -45,6 +45,10 @@ object Ui {
     val GREEN_DARK = Color.parseColor("#1E5A3E")
     val BLUE_TINT = Color.parseColor("#E3ECF6")
     val BLUE_DARK = Color.parseColor("#24476F")
+    val PURPLE = Color.parseColor("#5E4BA8")
+    val PURPLE_TINT = Color.parseColor("#ECE8F8")
+    val AMBER = Color.parseColor("#9A5B00")
+    val AMBER_TINT = Color.parseColor("#FCEFD8")
 
     fun dp(ctx: Context, v: Int): Int = (v * ctx.resources.displayMetrics.density + 0.5f).toInt()
 
