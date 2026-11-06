@@ -52,6 +52,21 @@ object Notifier {
             NotifyMethod.NONE -> "Bildirim kapalı"
             NotifyMethod.SMS -> sendSms(ctx, prefs, full)
             NotifyMethod.TELEGRAM -> sendTelegram(prefs.telegramToken, prefs.telegramChatId, full)
+            NotifyMethod.TELEGRAM_SMS -> {
+                // İnternet kapalıysa Telegram hemen hata verir; beklemeden SMS'e geç.
+                val tgError = sendTelegram(prefs.telegramToken, prefs.telegramChatId, full)
+                if (tgError == null) {
+                    null
+                } else {
+                    val smsError = sendSms(ctx, prefs, full)
+                    if (smsError == null) {
+                        prefs.addEvent("Telegram gitmedi ($tgError), SMS ile gönderildi.")
+                        null
+                    } else {
+                        "Telegram: $tgError / SMS: $smsError"
+                    }
+                }
+            }
         }
     }
 
@@ -90,8 +105,9 @@ object Notifier {
             conn = URL("https://api.telegram.org/bot$token/sendMessage").openConnection() as HttpURLConnection
             conn.requestMethod = "POST"
             conn.doOutput = true
-            conn.connectTimeout = 15_000
-            conn.readTimeout = 15_000
+            // Kısa tutuldu: gitmezse SMS yedeğine hızla geçilsin
+            conn.connectTimeout = 8_000
+            conn.readTimeout = 8_000
             conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
             val body = "chat_id=" + URLEncoder.encode(chatId, "UTF-8") +
                 "&text=" + URLEncoder.encode(text, "UTF-8")

@@ -9,12 +9,14 @@ Yaşlıları telefon dolandırıcılığından korumak için Android uygulaması
 | **Bilinmeyen arama filtresi** | Rehberde olmayan ve gizli numaralardan gelen aramalar telefonu hiç çaldırmadan reddedilir. |
 | **Görüşme süre sınırı** | Rehberde olmayan biriyle yapılan görüşme seçilen süre dolunca (5/10/15/20/30 dk) otomatik kesilir. |
 | **Güvenli kişiyi arama** | Görüşme kesilince ekranda büyük bir uyarı çıkar ve güvenli kişiler sırayla aranır. Biri açmazsa 45 saniye sonra sıradakine geçilir. |
-| **Geri arama engeli** | Kesilen numara bir süre (varsayılan 1 saat) ne arayabilir ne de aranabilir. Dolandırıcıların "hat kesilirse beni hemen geri ara" taktiğine karşı. |
-| **Aileye bildirim** | Kuruluma göre SMS ya da Telegram ile şunlar bildirilir: engellenen aramalar, rehber dışı bir numaranın aranması, uzun görüşme (sürenin yarısında), kesilen görüşme, ayarların açılması. |
+| **Geri arama engeli** | Kesilen numara bir süre (1 dakika ile 1 gün arası seçilebilir, varsayılan 1 saat) ne arayabilir ne de aranabilir. Dolandırıcıların "hat kesilirse beni hemen geri ara" taktiğine karşı. |
+| **Aileye bildirim** | Kuruluma göre SMS, Telegram ya da "Telegram, internet yoksa SMS" ile şunlar bildirilir: engellenen aramalar, rehber dışı bir numaranın aranması, uzun görüşme (sürenin yarısında), kesilen görüşme, ayarların açılması. |
 | **"Rehberde yok" uyarısı** | Korunan kişi kayıtlı olmayan bir numarayı aramak isterse önce uyarılır. |
 | **Rehber yönetimi** | Rehber ekranından kişi eklenebilir, düzenlenebilir ve silinebilir. |
 | **Rehber değişikliği bildirimi** | Rehbere kişi eklenince, silinince veya bir kişinin numarası değişince aileye haber gider. Değişiklik telefonun kendi Kişiler uygulamasından yapılsa bile yakalanır. |
 | **Yeni kişi kuralı (24 saat)** | Son 24 saatte rehbere eklenen numara aranamaz hale gelmez ama bilinmeyen numara gibi süre sınırına girer. Görüşme ekranında "Rehbere yeni eklendi" uyarısı çıkar, aileye de haber gider. Dolandırıcının "numaramı rehberine kaydet" taktiğine karşı. |
+| **"Arama bekliyorum"** | Ana ekrandan 15/30/45/60 dakika seçilir. Bu sürede rehberde olmayan numaralar da çalabilir (hastane, kargo vb.). Süre sınırı açık kalır, aile hemen bilgilendirilir. |
+| **Cevapsız aramalar** | Uygulama simgesinde sayı olarak görünür, ana ekranda "Son aramalar (2 cevapsız)" diye yazar. Engellenen aramalar sayılmaz. |
 | **PIN koruması** | Ayarlar aile PIN'i olmadan açılamaz. |
 | **Yaşlı dostu arayüz** | Büyük düğmeli ana ekran, rehber, son aramalar ve tuş takımı. Görüşme sırasında hoparlör, sessiz ve tuşlar düğmeleri var. |
 

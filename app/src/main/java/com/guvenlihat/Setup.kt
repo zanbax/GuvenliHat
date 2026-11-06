@@ -63,7 +63,7 @@ object Setup {
             Manifest.permission.READ_PHONE_STATE,
         )
         if (Build.VERSION.SDK_INT >= 33) list.add(Manifest.permission.POST_NOTIFICATIONS)
-        if (prefs.notifyMethod == NotifyMethod.SMS) list.add(Manifest.permission.SEND_SMS)
+        if (prefs.notifyMethod.usesSms) list.add(Manifest.permission.SEND_SMS)
         return list
     }
 
@@ -109,6 +109,15 @@ object Setup {
 
     fun openAppDetails(act: Activity) {
         tryStart(act, Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + act.packageName)))
+    }
+
+    fun openNotificationSettings(act: Activity) {
+        val i = if (Build.VERSION.SDK_INT >= 26) {
+            Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(Settings.EXTRA_APP_PACKAGE, act.packageName)
+        } else {
+            Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + act.packageName))
+        }
+        if (!tryStart(act, i)) openAppDetails(act)
     }
 
     fun openDefaultApps(act: Activity) {

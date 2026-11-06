@@ -61,7 +61,8 @@ object PhoneUtils {
     fun contactName(ctx: Context, number: String?): String? {
         if (number.isNullOrBlank() || !hasContactsPermission(ctx)) return null
         return try {
-            lookupRow(ctx, number)?.ifEmpty { null }
+            // İsimsiz kayıtlarda isim alanı numaranın kendisidir; onu isim sayma
+            lookupRow(ctx, number)?.takeIf { n -> n.any { it.isLetter() } }
         } catch (e: Exception) {
             null
         }

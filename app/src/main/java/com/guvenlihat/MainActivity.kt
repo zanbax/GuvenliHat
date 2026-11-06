@@ -3,12 +3,23 @@ package com.guvenlihat
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.widget.LinearLayout
 
 /** Yaşlı kişinin gördüğü ana ekran: büyük düğmeler. */
 class MainActivity : Activity() {
 
     private lateinit var root: LinearLayout
+    private val handler = Handler(Looper.getMainLooper())
+
+    /** "Arama bekliyorum" geri sayımını ve cevapsız sayısını tazeler. */
+    private val ticker = object : Runnable {
+        override fun run() {
+            if (Prefs(this@MainActivity).relaxUntil != 0L) build()
+            handler.postDelayed(this, 30_000)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -21,6 +32,12 @@ class MainActivity : Activity() {
         checkProtectionLost()
         ContactsWatcher.checkInBackground(this)
         build()
+        handler.postDelayed(ticker, 30_000)
+    }
+
+    override fun onPause() {
+        handler.removeCallbacks(ticker)
+        super.onPause()
     }
 
     private fun build() {
@@ -36,6 +53,27 @@ class MainActivity : Activity() {
                 22f, if (ok) Ui.GREEN else Ui.RED, bold = true,
             ),
         )
+
+        // "Arama bekliyorum": hastane, kargo gibi tanınmayan bir aramayı beklerken filtreyi geçici aç
+        if (prefs.filterUnknown) {
+            if (!prefs.relaxActive && prefs.relaxUntil != 0L) prefs.relaxUntil = 0L
+            if (prefs.relaxActive) {
+                val left = (prefs.relaxUntil - System.currentTimeMillis()) / 60_000L + 1
+                val box = Ui.label(
+                    this, "⏳ Tanımadığınız numaralar da arayabilir.\nKalan süre: $left dakika", 22f, Ui.TEXT, bold = true,
+                )
+                val p = Ui.dp(this, 14)
+                box.setPadding(p, p, p, p)
+                box.setBackgroundColor(Ui.YELLOW)
+                root.addView(box)
+                root.addView(Ui.button(this, "Beklemeyi bitir", Ui.RED, 22f) {
+                    CallManager.stopRelax(this)
+                    build()
+                })
+            } else {
+                root.addView(Ui.button(this, "⏳  Arama bekliyorum", Ui.KEY, 24f) { askRelax() })
+            }
+        }
 
         if (CallManager.hasCalls()) {
             root.addView(Ui.button(this, "Görüşmeye dön", Ui.GREEN, 28f) {
@@ -59,7 +97,9 @@ class MainActivity : Activity() {
         root.addView(Ui.button(this, "Rehber", Ui.BLUE, 26f) {
             startActivity(Intent(this, ContactsActivity::class.java))
         })
-        root.addView(Ui.button(this, "Son aramalar", Ui.BLUE, 26f) {
+        val missed = prefs.missedCount
+        val recentsText = if (missed > 0) "Son aramalar  ($missed cevapsız)" else "Son aramalar"
+        root.addView(Ui.button(this, recentsText, if (missed > 0) Ui.RED else Ui.BLUE, 26f) {
             startActivity(Intent(this, RecentsActivity::class.java))
         })
         root.addView(Ui.button(this, "Numara tuşla", Ui.BLUE, 26f) {
@@ -69,6 +109,21 @@ class MainActivity : Activity() {
         root.addView(Ui.button(this, "Ayarlar (aile için)", Ui.GRAY, 18f) {
             startActivity(Intent(this, SettingsActivity::class.java))
         })
+    }
+
+    private fun askRelax() {
+        val options = listOf(15, 30, 45, 60).map { m ->
+            Triple<String, Int, () -> Unit>("$m dakika", Ui.BLUE) {
+                CallManager.startRelax(this, m)
+                build()
+            }
+        }
+        Ui.actions(
+            this,
+            "Tanımadığınız bir numaradan (hastane, doktor, kargo) arama mı bekliyorsunuz?\n\n" +
+                "Seçtiğiniz süre boyunca bu aramalar engellenmez. Aileniz bilgilendirilir.",
+            options,
+        )
     }
 
     /** Uygulama varsayılan telefon uygulaması olmaktan çıkarılırsa aileye haber ver. */

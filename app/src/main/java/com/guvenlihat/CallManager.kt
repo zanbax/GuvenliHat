@@ -9,6 +9,7 @@ import android.os.PowerManager
 import android.os.SystemClock
 import android.telecom.Call
 import android.telecom.CallAudioState
+import android.telecom.DisconnectCause
 import android.telecom.VideoProfile
 
 /**
@@ -38,6 +39,7 @@ object CallManager {
         var activeSince = 0L
         var wasActive = false
         var cutByLimit = false
+        var rejectedByUser = false
     }
 
     private val main = Handler(Looper.getMainLooper())
@@ -106,6 +108,7 @@ object CallManager {
             prefs.redialBlockedUntil(PhoneUtils.key(number)) > 0
         ) return REASON_REDIAL
         if (!prefs.filterUnknown) return null
+        if (prefs.relaxActive) return null
         if (PhoneUtils.isSafe(prefs, number)) return null
         if (System.currentTimeMillis() - prefs.lastEmergencyCallAt < EMERGENCY_GRACE_MS) return null
         return if (PhoneUtils.isKnown(ctx, number) == false) REASON_UNKNOWN else null
@@ -180,6 +183,12 @@ object CallManager {
             )
         }
 
+        if (incoming && unknown && prefs.filterUnknown && prefs.relaxActive) {
+            Notifier.send(
+                app, "\"Arama bekliyorum\" açıkken rehberde olmayan ${number ?: "gizli numara"} aradı, arama çalıyor.",
+                throttleKey = "relaxin_" + PhoneUtils.key(number).ifEmpty { "gizli" },
+            )
+        }
         if (!incoming && unknown && !emergency && !safe) {
             Notifier.send(
                 app, "Rehberde olmayan $number numarasını arıyor.",
@@ -210,6 +219,17 @@ object CallManager {
         calls.remove(call)
         val info = infos.remove(call)
         if (infos.values.none { it.limited && it.wasActive }) releaseWakeLock()
+
+        if (info != null && info.incoming && !info.wasActive && !info.rejectedByUser) {
+            val cause = try {
+                call.details.disconnectCause?.code
+            } catch (e: Exception) {
+                null
+            }
+            if (cause != DisconnectCause.REJECTED) {
+                MissedCalls.add(app, PhoneUtils.label(app, info.number))
+            }
+        }
 
         if (info != null) {
             if (info.cutByLimit) {
@@ -322,6 +342,25 @@ object CallManager {
         PhoneUtils.placeCall(app, c.number, autoSim = true)
     }
 
+    // ---------- "Arama bekliyorum" (geçici gevşetme) ----------
+
+    fun startRelax(ctx: Context, minutes: Int) {
+        val prefs = Prefs(ctx)
+        prefs.relaxUntil = System.currentTimeMillis() + minutes * 60_000L
+        Notifier.send(
+            ctx,
+            "\"Arama bekliyorum\" açıldı: $minutes dakika boyunca rehberde olmayan numaralar da arayabilir. " +
+                "Süre sınırı açık kalıyor.",
+        )
+    }
+
+    fun stopRelax(ctx: Context) {
+        val prefs = Prefs(ctx)
+        if (!prefs.relaxActive) return
+        prefs.relaxUntil = 0L
+        Notifier.send(ctx, "\"Arama bekliyorum\" erken kapatıldı, koruma tekrar tam açık.")
+    }
+
     // ---------- Ekrandaki düğmeler ----------
 
     fun answer() {
@@ -331,7 +370,12 @@ object CallManager {
     fun hangup() {
         val c = primaryCall() ?: return
         if (infos[c]?.fromChain == true) chainActive = false
-        if (stateOf(c) == Call.STATE_RINGING) c.reject(false, null) else c.disconnect()
+        if (stateOf(c) == Call.STATE_RINGING) {
+            infos[c]?.rejectedByUser = true
+            c.reject(false, null)
+        } else {
+            c.disconnect()
+        }
     }
 
     @Suppress("DEPRECATION")

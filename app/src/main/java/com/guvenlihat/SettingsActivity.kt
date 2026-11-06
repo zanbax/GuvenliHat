@@ -172,7 +172,7 @@ class SettingsActivity : Activity() {
         // 1. Kurulum
         section("1. Kurulum")
         val needsRestricted = !Setup.isDefaultDialer(this) ||
-            (prefs.notifyMethod == NotifyMethod.SMS && !PhoneUtils.has(this, Manifest.permission.SEND_SMS))
+            (prefs.notifyMethod.usesSms && !PhoneUtils.has(this, Manifest.permission.SEND_SMS))
         if (Build.VERSION.SDK_INT >= 33 && needsRestricted) {
             root.addView(
                 Ui.label(
@@ -212,6 +212,8 @@ class SettingsActivity : Activity() {
                 Setup.openXiaomiPermissions(this)
             }
         }
+        note("Cevapsız arama sayısının Güvenli Hat simgesinde görünmesi için bildirim ayarlarında 'Uygulama simgesi işaretleri' (rozet) açık olmalı.")
+        smallButton("Bildirim ayarlarını aç") { Setup.openNotificationSettings(this) }
         note(
             "WhatsApp aramaları: WhatsApp > Ayarlar > Gizlilik > Aramalar > " +
                 "'Bilinmeyen arayanları sessize al' seçeneğini açın.",
@@ -273,9 +275,13 @@ class SettingsActivity : Activity() {
         ) { prefs.limitMode = it }
         root.addView(Ui.label(this, "Kesilen numara ne kadar süre engellensin?", 20f, bold = true))
         choice(
-            listOf(30 to "30 dakika", 60 to "1 saat", 180 to "3 saat", 1440 to "1 gün"),
+            listOf(
+                1 to "1 dakika (deneme için)", 5 to "5 dakika", 10 to "10 dakika", 15 to "15 dakika",
+                30 to "30 dakika", 60 to "1 saat (önerilen)", 180 to "3 saat", 1440 to "1 gün",
+            ),
             prefs.redialBlockMinutes,
         ) { prefs.redialBlockMinutes = it }
+        note("Dolandırıcılar kesilen hattı genelde hemen geri arar; kısa süreler bu yüzden daha az korur.")
 
         // 5. Filtre
         section("5. Bilinmeyen arama filtresi")
@@ -295,45 +301,47 @@ class SettingsActivity : Activity() {
                 NotifyMethod.NONE to "Kapalı",
                 NotifyMethod.SMS to "SMS (güvenli kişilere)",
                 NotifyMethod.TELEGRAM to "Telegram (aile grubuna)",
+                NotifyMethod.TELEGRAM_SMS to "Telegram, internet yoksa SMS (önerilen)",
             ),
             prefs.notifyMethod,
         ) {
             prefs.notifyMethod = it
             root.post { build() }
         }
-        when (prefs.notifyMethod) {
-            NotifyMethod.SMS -> {
-                note(
-                    "SMS'ler korunan kişinin hattından gönderilir. Paketinde SMS yoksa operatör " +
-                        "ücret alabilir. Aynı numara için 10 dakikada bir mesaj gider.",
-                )
-                if (!PhoneUtils.has(this, Manifest.permission.SEND_SMS)) {
-                    smallButton("SMS iznini ver") { requestPermissions(arrayOf(Manifest.permission.SEND_SMS), RC_PERMS) }
-                }
+        val method = prefs.notifyMethod
+        if (method == NotifyMethod.TELEGRAM_SMS) {
+            note("Mesaj önce internetten Telegram'a gönderilir. İnternet kapalıysa ya da gitmezse aynı mesaj SMS ile güvenli kişilere gider.")
+        }
+        if (method.usesSms) {
+            note(
+                "SMS'ler korunan kişinin hattından gönderilir. Paketinde SMS yoksa operatör " +
+                    "ücret alabilir. Aynı numara için 10 dakikada bir mesaj gider.",
+            )
+            if (!PhoneUtils.has(this, Manifest.permission.SEND_SMS)) {
+                smallButton("SMS iznini ver") { requestPermissions(arrayOf(Manifest.permission.SEND_SMS), RC_PERMS) }
             }
-            NotifyMethod.TELEGRAM -> {
-                note(
-                    "1) Telegram'da @BotFather'a yazın, /newbot ile bir bot oluşturun ve verdiği token'ı aşağıya yapıştırın.\n" +
-                        "2) Bir aile grubu kurun, botu gruba ekleyin ve grupta /start yazın.\n" +
-                        "3) 'Aile grubunu bul' düğmesine basın.",
-                )
-                val tf = EditText(this)
-                tf.setText(prefs.telegramToken)
-                tf.hint = "Bot token (123456:ABC...)"
-                tf.textSize = 18f
-                tf.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
-                tokenField = tf
-                root.addView(tf)
-                val chat = prefs.telegramChatTitle.ifBlank { prefs.telegramChatId }
-                root.addView(
-                    Ui.label(
-                        this, if (chat.isBlank()) "Grup seçilmedi" else "Seçili: $chat", 20f,
-                        if (chat.isBlank()) Ui.RED else Ui.GREEN, bold = true,
-                    ),
-                )
-                smallButton("Aile grubunu bul") { findTelegramChats() }
-            }
-            NotifyMethod.NONE -> {}
+        }
+        if (method.usesTelegram) {
+            note(
+                "1) Telegram'da @BotFather'a yazın, /newbot ile bir bot oluşturun ve verdiği token'ı aşağıya yapıştırın.\n" +
+                    "2) Bir aile grubu kurun, botu gruba ekleyin ve grupta /start yazın.\n" +
+                    "3) 'Aile grubunu bul' düğmesine basın.",
+            )
+            val tf = EditText(this)
+            tf.setText(prefs.telegramToken)
+            tf.hint = "Bot token (123456:ABC...)"
+            tf.textSize = 18f
+            tf.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
+            tokenField = tf
+            root.addView(tf)
+            val chat = prefs.telegramChatTitle.ifBlank { prefs.telegramChatId }
+            root.addView(
+                Ui.label(
+                    this, if (chat.isBlank()) "Grup seçilmedi" else "Seçili: $chat", 20f,
+                    if (chat.isBlank()) Ui.RED else Ui.GREEN, bold = true,
+                ),
+            )
+            smallButton("Aile grubunu bul") { findTelegramChats() }
         }
         if (prefs.notifyMethod != NotifyMethod.NONE) {
             smallButton("Deneme mesajı gönder", Ui.GREEN) { sendTest() }

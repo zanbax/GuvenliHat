@@ -11,7 +11,13 @@ import java.util.Locale
 
 data class SafeContact(val name: String, val number: String)
 
-enum class NotifyMethod { NONE, SMS, TELEGRAM }
+/** TELEGRAM_SMS: önce internetten Telegram, gitmezse (internet kapalı vb.) SMS. */
+enum class NotifyMethod {
+    NONE, SMS, TELEGRAM, TELEGRAM_SMS;
+
+    val usesSms get() = this == SMS || this == TELEGRAM_SMS
+    val usesTelegram get() = this == TELEGRAM || this == TELEGRAM_SMS
+}
 
 /** Süre sınırının hangi aramalara uygulanacağı. */
 enum class LimitMode { UNKNOWN_ONLY, ALL_EXCEPT_SAFE }
@@ -65,6 +71,21 @@ class Prefs(context: Context) {
     var lastEmergencyCallAt: Long
         get() = sp.getLong("last_emergency", 0L)
         set(value) = sp.edit().putLong("last_emergency", value).apply()
+
+    /** "Arama bekliyorum": bu zamana kadar bilinmeyen aramalar engellenmez. */
+    var relaxUntil: Long
+        get() = sp.getLong("relax_until", 0L)
+        set(value) = sp.edit().putLong("relax_until", value).apply()
+
+    val relaxActive: Boolean get() = relaxUntil > System.currentTimeMillis()
+
+    var missedCount: Int
+        get() = sp.getInt("missed_count", 0)
+        set(value) = sp.edit().putInt("missed_count", value).apply()
+
+    var missedLastName: String
+        get() = sp.getString("missed_last_name", "") ?: ""
+        set(value) = sp.edit().putString("missed_last_name", value).apply()
 
     /** Rehberin son görülen hali (ContactsWatcher kullanır). */
     var contactSnapshot: String?

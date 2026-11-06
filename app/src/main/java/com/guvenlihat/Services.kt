@@ -80,6 +80,19 @@ class GuardScreeningService : CallScreeningService() {
     }
 }
 
+/**
+ * Sistem cevapsız aramaları varsayılan telefon uygulamasına bu yayınla bildirir.
+ * Bu alıcı varken sistem kendi bildirimini göstermez; biz gösteririz (simgede sayıyla).
+ */
+class MissedCallReceiver : BroadcastReceiver() {
+    override fun onReceive(context: Context, intent: Intent) {
+        if (intent.action != android.telecom.TelecomManager.ACTION_SHOW_MISSED_CALLS_NOTIFICATION) return
+        val count = intent.getIntExtra(android.telecom.TelecomManager.EXTRA_NOTIFICATION_COUNT, 0)
+        val number = intent.getStringExtra(android.telecom.TelecomManager.EXTRA_NOTIFICATION_PHONE_NUMBER)
+        MissedCalls.syncFromSystem(context, count, number)
+    }
+}
+
 /** Bildirimdeki "Kapat / Reddet" düğmesi. */
 class CallActionReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {

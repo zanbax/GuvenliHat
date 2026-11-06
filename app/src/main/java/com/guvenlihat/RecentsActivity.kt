@@ -35,6 +35,12 @@ class RecentsActivity : Activity() {
         fill(list)
     }
 
+    override fun onResume() {
+        super.onResume()
+        // Liste görüldü: cevapsız sayısını ve simgedeki rozeti sıfırla
+        MissedCalls.clear(this)
+    }
+
     private fun fill(list: LinearLayout) {
         val fmt = SimpleDateFormat("d MMM HH:mm", Locale("tr"))
         var count = 0
@@ -48,7 +54,8 @@ class RecentsActivity : Activity() {
                     val number = c.getString(0) ?: ""
                     val type = c.getInt(2)
                     if (type == CallLog.Calls.BLOCKED_TYPE) continue
-                    val name = c.getString(1)?.takeIf { it.isNotBlank() }
+                    // İsimsiz kayıtlarda isim alanı numaranın kendisi olabilir: harf yoksa isim sayma
+                    val name = c.getString(1)?.takeIf { n -> n.any { it.isLetter() } }
                         ?: PhoneUtils.contactName(this, number)
                         ?: PhoneUtils.safeName(Prefs(this), number)
                     val known = name != null

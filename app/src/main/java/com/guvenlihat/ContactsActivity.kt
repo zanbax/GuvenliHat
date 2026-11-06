@@ -28,7 +28,11 @@ class ContactsActivity : Activity() {
         const val RESULT_NUMBER = "number"
     }
 
-    private data class Entry(val name: String, val number: String, val contactId: Long, val lookupKey: String?)
+    private data class Entry(val name: String, val number: String, val contactId: Long, val lookupKey: String?) {
+        /** İsimsiz kayıtlarda isim alanı numaranın kendisidir */
+        val hasName: Boolean get() = name.any { it.isLetter() }
+        val title: String get() = if (hasName) name else number
+    }
 
     private var all = listOf<Entry>()
     private lateinit var list: LinearLayout
@@ -101,7 +105,8 @@ class ContactsActivity : Activity() {
             }
         } catch (e: Exception) {
         }
-        return out
+        // İsimsiz (sadece numarayla kayıtlı) kişiler listenin sonuna
+        return out.sortedBy { !it.hasName }
     }
 
     private fun render(query: String) {
@@ -119,7 +124,8 @@ class ContactsActivity : Activity() {
             return
         }
         for (e in shown) {
-            val b = Ui.button(this, "${e.name}\n${e.number}", Ui.BLUE, 24f) { onTap(e) }
+            val text = if (e.hasName) "${e.name}\n${e.number}" else e.number
+            val b = Ui.button(this, text, Ui.BLUE, 24f) { onTap(e) }
             b.gravity = Gravity.START or Gravity.CENTER_VERTICAL
             list.addView(b)
         }
@@ -132,7 +138,7 @@ class ContactsActivity : Activity() {
             return
         }
         Ui.actions(
-            this, "${e.name}\n${e.number}",
+            this, if (e.hasName) "${e.name}\n${e.number}" else e.number,
             listOf(
                 Triple("📞  Ara", Ui.GREEN) { CallFlow.start(this, e.number) },
                 Triple("✏️  Düzenle", Ui.BLUE) { editContact(e) },
@@ -165,13 +171,13 @@ class ContactsActivity : Activity() {
             Ui.info(this, "İzin yok", "Kişi silme izni verilmemiş. Ailenizden ayarları yapmasını isteyin.")
             return
         }
-        Ui.ask(this, "Kişiyi sil", "${e.name} rehberden silinsin mi?\n\nBu işlem geri alınamaz.", yes = "Sil") {
+        Ui.ask(this, "Kişiyi sil", "${e.title} rehberden silinsin mi?\n\nBu işlem geri alınamaz.", yes = "Sil") {
             val ok = try {
                 contentResolver.delete(lookupUri(e), null, null) > 0
             } catch (ex: Exception) {
                 false
             }
-            Toast.makeText(this, if (ok) "${e.name} silindi" else "Silinemedi", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, if (ok) "${e.title} silindi" else "Silinemedi", Toast.LENGTH_LONG).show()
             all = load()
             render(search.text.toString())
             ContactsWatcher.checkInBackground(this)

@@ -98,5 +98,14 @@
         <receiver
             android:name=".CallActionReceiver"
             android:exported="false" />
+
+        <!-- Sistem cevapsız aramaları buraya bildirir; bildirim ve simge sayısını biz gösteririz -->
+        <receiver
+            android:name=".MissedCallReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.telecom.action.SHOW_MISSED_CALLS_NOTIFICATION" />
+            </intent-filter>
+        </receiver>
     </application>
 </manifest>
