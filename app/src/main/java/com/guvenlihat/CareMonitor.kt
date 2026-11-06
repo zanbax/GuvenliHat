@@ -51,16 +51,36 @@ object CareMonitor {
             am.cancel(pi)
             return
         }
-        // Belirli saatlerde gönderimde bir sonraki saate hizala (en geç 30 dk sonra yine uyan)
-        var delay = TICK_MS
-        val next = nextScheduledTime(Prefs(ctx), System.currentTimeMillis())
-        if (next != null) delay = minOf(delay, maxOf(60_000L, next - System.currentTimeMillis() + 60_000L))
+        // Düzenli kontrol (hareketsizlik, pil, aralıklı konum): esnek alarm, pil dostu
         try {
-            am.setAndAllowWhileIdle(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + delay, pi)
+            am.setAndAllowWhileIdle(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + TICK_MS, pi)
         } catch (e: Exception) {
-            am.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + delay, pi)
+            am.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + TICK_MS, pi)
+        }
+        // "Belirli saatlerde" konum: o saat için ayrı, TAM zamanlı alarm (Doze/Xiaomi geciktirmesin)
+        val exactPi = exactIntent(ctx)
+        val next = nextScheduledTime(Prefs(ctx), System.currentTimeMillis())
+        if (next == null) {
+            am.cancel(exactPi)
+        } else {
+            val at = next + 5_000L
+            try {
+                if (Build.VERSION.SDK_INT < 31 || am.canScheduleExactAlarms()) {
+                    am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, at, exactPi)
+                } else {
+                    am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, at, exactPi)
+                }
+            } catch (e: Exception) {
+                am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, at, exactPi)
+            }
         }
     }
+
+    private fun exactIntent(ctx: Context): PendingIntent =
+        PendingIntent.getBroadcast(
+            ctx, 11, Intent(ctx, CareReceiver::class.java).setAction(ACTION_TICK).putExtra("exact", true),
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
 
     private fun tickIntent(ctx: Context): PendingIntent =
         PendingIntent.getBroadcast(
