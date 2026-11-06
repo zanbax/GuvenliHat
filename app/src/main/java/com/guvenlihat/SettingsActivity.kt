@@ -423,15 +423,31 @@ class SettingsActivity : Activity() {
         root.addView(loc)
         if (prefs.locationEnabled) {
             note("Seçilen saatler arasında konum (harita linki) ve pil seviyesi gönderilir. Her gönderimde korunan kişinin telefonunda sessiz bir \"Konumunuz yakınlarınıza gönderildi\" bildirimi çıkar.")
+            root.addView(Ui.label(this, "Ne zaman gönderilsin?", 18f, bold = true))
             choice(
-                listOf(1 to "Saatte bir", 2 to "2 saatte bir", 3 to "3 saatte bir", 6 to "6 saatte bir"),
-                prefs.locationIntervalHours,
-            ) { prefs.locationIntervalHours = it }
-            smallButton("Gönderim saatleri: ${hourRange(prefs.locationStart, prefs.locationEnd, "bütün gün")}  (değiştir)", Ui.GRAY) {
-                pickHours("Gönderim saatleri", listOf(8 to 20, 9 to 21, 7 to 22), "Bütün gün") { st, en ->
-                    prefs.locationStart = st
-                    prefs.locationEnd = en
-                    build()
+                listOf(false to "Belirli aralıklarla (örn. 2 saatte bir)", true to "Belirli saatlerde (örn. 14:00 ve 17:00)"),
+                prefs.locationAtTimes,
+            ) {
+                prefs.locationAtTimes = it
+                CareMonitor.schedule(this)
+                root.post { build() }
+            }
+            if (prefs.locationAtTimes) {
+                val times = prefs.locationTimes
+                val label = if (times.isEmpty()) "seçilmedi" else times.joinToString(", ") { String.format(java.util.Locale.US, "%02d:00", it) }
+                smallButton("Saatler: $label  (değiştir)", Ui.GRAY) { pickTimes() }
+                note("Konum seçilen saatten sonraki birkaç dakika içinde gönderilir (en geç yarım saat).")
+            } else {
+                choice(
+                    listOf(1 to "Saatte bir", 2 to "2 saatte bir", 3 to "3 saatte bir", 6 to "6 saatte bir"),
+                    prefs.locationIntervalHours,
+                ) { prefs.locationIntervalHours = it }
+                smallButton("Gönderim saatleri: ${hourRange(prefs.locationStart, prefs.locationEnd, "bütün gün")}  (değiştir)", Ui.GRAY) {
+                    pickHours("Gönderim saatleri", listOf(8 to 20, 9 to 21, 7 to 22), "Bütün gün") { st, en ->
+                        prefs.locationStart = st
+                        prefs.locationEnd = en
+                        build()
+                    }
                 }
             }
             statusRow("Konum izni", CareMonitor.hasLocationPermission(this), "İzin ver") {
@@ -481,6 +497,24 @@ class SettingsActivity : Activity() {
             Triple<String, Int, () -> Unit>(hourRange(st, en, noneLabel), Ui.BLUE) { onPick(st, en) }
         } + Triple<String, Int, () -> Unit>(noneLabel, Ui.GRAY) { onPick(0, 0) }
         Ui.actions(this, title, items)
+    }
+
+    /** Konumun gönderileceği saatleri çoklu seçimle belirle (06:00–23:00). */
+    private fun pickTimes() {
+        val hours = (6..23).toList()
+        val labels = hours.map { String.format(java.util.Locale.US, "%02d:00", it) }.toTypedArray()
+        val current = prefs.locationTimes
+        val checked = BooleanArray(hours.size) { hours[it] in current }
+        AlertDialog.Builder(this)
+            .setTitle("Hangi saatlerde gönderilsin?")
+            .setMultiChoiceItems(labels, checked) { _, which, isChecked -> checked[which] = isChecked }
+            .setPositiveButton("Kaydet") { _, _ ->
+                prefs.locationTimes = hours.filterIndexed { i, _ -> checked[i] }
+                CareMonitor.schedule(this)
+                build()
+            }
+            .setNegativeButton("Vazgeç", null)
+            .show()
     }
 
     private fun requestBackgroundLocation() {

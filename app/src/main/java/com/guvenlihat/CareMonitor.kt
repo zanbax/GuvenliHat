@@ -51,10 +51,14 @@ object CareMonitor {
             am.cancel(pi)
             return
         }
+        // Belirli saatlerde gönderimde bir sonraki saate hizala (en geç 30 dk sonra yine uyan)
+        var delay = TICK_MS
+        val next = nextScheduledTime(Prefs(ctx), System.currentTimeMillis())
+        if (next != null) delay = minOf(delay, maxOf(60_000L, next - System.currentTimeMillis() + 60_000L))
         try {
-            am.setAndAllowWhileIdle(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + TICK_MS, pi)
+            am.setAndAllowWhileIdle(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + delay, pi)
         } catch (e: Exception) {
-            am.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + TICK_MS, pi)
+            am.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + delay, pi)
         }
     }
 
@@ -225,8 +229,34 @@ object CareMonitor {
 
     // ---------------- Konum ----------------
 
+    /** Bugün (veya yarın) saat h:00'ın zaman damgası. */
+    private fun atHour(now: Long, h: Int, dayOffset: Int = 0): Long =
+        Calendar.getInstance().apply {
+            timeInMillis = now
+            add(Calendar.DAY_OF_YEAR, dayOffset)
+            set(Calendar.HOUR_OF_DAY, h)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }.timeInMillis
+
+    /** "Belirli saatlerde" modunda bir sonraki gönderim zamanı. */
+    private fun nextScheduledTime(prefs: Prefs, now: Long): Long? {
+        if (!prefs.locationEnabled || !prefs.locationAtTimes) return null
+        val hours = prefs.locationTimes
+        if (hours.isEmpty()) return null
+        return hours.map { atHour(now, it) }.filter { it > now }.minOrNull() ?: atHour(now, hours.first(), 1)
+    }
+
     private fun isLocationDue(prefs: Prefs, now: Long): Boolean {
         if (!prefs.locationEnabled) return false
+        if (prefs.locationAtTimes) {
+            // Seçilen saat geldiyse ve o saatten beri gönderilmediyse (en fazla 2 saat geç kalınabilir)
+            return prefs.locationTimes.any { h ->
+                val t = atHour(now, h)
+                now >= t && now - t < 2 * HOUR && prefs.lastLocationSentAt < t
+            }
+        }
         val h = hourOf(now)
         // start == end "bütün gün" demek
         if (prefs.locationStart != prefs.locationEnd && !inHours(h, prefs.locationStart, prefs.locationEnd)) return false

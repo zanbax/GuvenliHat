@@ -112,7 +112,8 @@ object Support {
         sb.append("Sesli okuma: ${yesNo(prefs.announceCaller)}\n")
         sb.append("Hareketsizlik uyarısı: ${if (prefs.inactivityHours > 0) "${prefs.inactivityHours} saat" else "kapalı"} (uyku ${prefs.sleepStart}-${prefs.sleepEnd})\n")
         sb.append("Kullanım erişimi: ${yesNo(CareMonitor.hasUsageAccess(act))}\n")
-        sb.append("Konum paylaşımı: ${if (prefs.locationEnabled) "${prefs.locationIntervalHours} saatte bir, ${prefs.locationStart}-${prefs.locationEnd}" else "kapalı"}\n")
+        val locMode = if (prefs.locationAtTimes) "saatler: ${prefs.locationTimes.joinToString(",")}" else "${prefs.locationIntervalHours} saatte bir, ${prefs.locationStart}-${prefs.locationEnd}"
+        sb.append("Konum paylaşımı: ${if (prefs.locationEnabled) locMode else "kapalı"}\n")
         sb.append("Konum izni: ${yesNo(CareMonitor.hasLocationPermission(act))}, arka plan: ${yesNo(CareMonitor.hasBackgroundLocation(act))}\n")
         sb.append("\n--- Son olaylar (numaralar gizlendi) ---\n")
         prefs.events().take(40).forEach { sb.append(mask(it)).append('\n') }

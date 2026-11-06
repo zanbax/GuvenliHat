@@ -21,7 +21,7 @@ Yaşlıları telefon dolandırıcılığından korumak için Android uygulaması
 | **Sesli okuma** | Ayarlardan açılırsa gelen aramada "Ayşe arıyor" diye okur; rehberde olmayan numarada "Dikkat" der. Telefon sessizdeyken okumaz. |
 | **Renkler** | Kırmızı sadece rehberde olmayan (şüpheli) aramalar için kullanılır. Yumuşak, göz yormayan ama okunaklı palet. |
 | **Hareketsizlik uyarısı** (isteğe bağlı) | Telefon 6/12/24 saat hiç kullanılmazsa (ekran, uygulama, arama) güvenli kişilere son konum ve pil bilgisiyle haber gider. Uyku saatleri sayılmaz. |
-| **Aralıklı konum** (isteğe bağlı) | Seçilen saatler arasında 1/2/3/6 saatte bir konum (harita linki) ve pil bilgisi gönderilir. Her gönderimde korunan kişinin telefonunda sessiz bir "Konumunuz yakınlarınıza gönderildi" bildirimi çıkar. |
+| **Aralıklı konum** (isteğe bağlı) | Ya belirli aralıklarla (1/2/3/6 saatte bir, seçilen saatler arasında) ya da belirli saatlerde (örn. 14:00 ve 17:00) konum (harita linki) ve pil bilgisi gönderilir. Her gönderimde korunan kişinin telefonunda sessiz bir "Konumunuz yakınlarınıza gönderildi" bildirimi çıkar. |
 | **PIN koruması** | Ayarlar aile PIN'i olmadan açılamaz. |
 | **Yaşlı dostu arayüz** | Büyük düğmeli ana ekran, rehber, son aramalar ve tuş takımı. Görüşme sırasında hoparlör, sessiz ve tuşlar düğmeleri var. |
 

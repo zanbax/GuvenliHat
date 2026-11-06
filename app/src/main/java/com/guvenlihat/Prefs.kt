@@ -114,6 +114,17 @@ class Prefs(context: Context) {
         get() = sp.getBoolean("location_enabled", false)
         set(value) = sp.edit().putBoolean("location_enabled", value).apply()
 
+    /** true: belirli saatlerde (locationTimes), false: belirli aralıklarla */
+    var locationAtTimes: Boolean
+        get() = sp.getBoolean("location_at_times", false)
+        set(value) = sp.edit().putBoolean("location_at_times", value).apply()
+
+    /** Konumun gönderileceği saatler (0–23), örn. [9, 14, 17] */
+    var locationTimes: List<Int>
+        get() = (sp.getString("location_times", "9,14,18") ?: "")
+            .split(",").mapNotNull { it.trim().toIntOrNull() }.filter { it in 0..23 }.distinct().sorted()
+        set(value) = sp.edit().putString("location_times", value.distinct().sorted().joinToString(",")).apply()
+
     var locationIntervalHours: Int
         get() = sp.getInt("location_interval", 2)
         set(value) = sp.edit().putInt("location_interval", value).apply()
