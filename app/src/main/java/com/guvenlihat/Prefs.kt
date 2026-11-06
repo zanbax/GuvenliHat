@@ -72,6 +72,11 @@ class Prefs(context: Context) {
         get() = sp.getLong("last_emergency", 0L)
         set(value) = sp.edit().putLong("last_emergency", value).apply()
 
+    /** Gelen aramada arayanın adını sesli oku */
+    var announceCaller: Boolean
+        get() = sp.getBoolean("announce_caller", false)
+        set(value) = sp.edit().putBoolean("announce_caller", value).apply()
+
     /** "Arama bekliyorum": bu zamana kadar bilinmeyen aramalar engellenmez. */
     var relaxUntil: Long
         get() = sp.getLong("relax_until", 0L)

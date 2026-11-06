@@ -1,19 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Yeşil telefon + köşede kalkan içinde kalp: "telefon" + "aile koruması" -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="48dp"
     android:height="48dp"
-    android:viewportWidth="24"
-    android:viewportHeight="24">
-    <!-- yeşil yuvarlak kare zemin -->
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- yeşil daire -->
     <path
-        android:fillColor="#FF2E7D32"
-        android:pathData="M5,1h14a4,4 0 0 1 4,4v14a4,4 0 0 1 -4,4H5a4,4 0 0 1 -4,-4V5a4,4 0 0 1 4,-4z" />
-    <!-- beyaz kalkan -->
+        android:fillColor="#FF34A065"
+        android:pathData="M2,24a22,22 0 1,0 44,0a22,22 0 1,0 -44,0z" />
+    <!-- beyaz ahize -->
+    <group
+        android:scaleX="1.2"
+        android:scaleY="1.2"
+        android:translateX="9.5"
+        android:translateY="9.5">
+        <path
+            android:fillColor="#FFFFFFFF"
+            android:pathData="M6.62,10.79c1.44,2.83 3.76,5.14 6.59,6.59l2.2,-2.2c0.27,-0.27 0.67,-0.36 1.02,-0.24 1.12,0.37 2.33,0.57 3.57,0.57 0.55,0 1,0.45 1,1V20c0,0.55 -0.45,1 -1,1 -9.39,0 -17,-7.61 -17,-17 0,-0.55 0.45,-1 1,-1h3.5c0.55,0 1,0.45 1,1 0,1.25 0.2,2.45 0.57,3.57 0.11,0.35 0.03,0.74 -0.25,1.02l-2.2,2.2z" />
+    </group>
+    <!-- beyaz rozet -->
     <path
         android:fillColor="#FFFFFFFF"
-        android:pathData="M12,3.5l6.5,2.6v4.9c0,4.1 -2.8,7.8 -6.5,9 -3.7,-1.2 -6.5,-4.9 -6.5,-9V6.1z" />
-    <!-- yeşil telefon ahizesi -->
-    <path
-        android:fillColor="#FF2E7D32"
-        android:pathData="M9.6,9.3c0.6,1.2 1.6,2.2 2.8,2.8l0.9,-0.9c0.1,-0.1 0.3,-0.15 0.45,-0.1 0.5,0.16 1,0.25 1.5,0.25 0.25,0 0.45,0.2 0.45,0.45v1.5c0,0.25 -0.2,0.45 -0.45,0.45 -4,0 -7.2,-3.2 -7.2,-7.2 0,-0.25 0.2,-0.45 0.45,-0.45h1.5c0.25,0 0.45,0.2 0.45,0.45 0,0.53 0.08,1.03 0.24,1.5 0.05,0.15 0.01,0.32 -0.1,0.44l-0.94,0.86z" />
+        android:strokeColor="#FF34A065"
+        android:strokeWidth="1.5"
+        android:pathData="M24.5,35.5a11,11 0 1,0 22,0a11,11 0 1,0 -22,0z" />
+    <!-- kalkan -->
+    <group
+        android:scaleX="0.62"
+        android:scaleY="0.62"
+        android:translateX="28.06"
+        android:translateY="28.2">
+        <path
+            android:fillColor="#FF2F7D57"
+            android:pathData="M12,1L3,5v6c0,5.55 3.84,10.74 9,12 5.16,-1.26 9,-6.45 9,-12V5l-9,-4z" />
+    </group>
+    <!-- kalp -->
+    <group
+        android:scaleX="0.3"
+        android:scaleY="0.3"
+        android:translateX="32.3"
+        android:translateY="32.0">
+        <path
+            android:fillColor="#FFFFFFFF"
+            android:pathData="M12,21.35l-1.45,-1.32C5.4,15.36 2,12.28 2,8.5 2,5.42 4.42,3 7.5,3c1.74,0 3.41,0.81 4.5,2.09C13.09,3.81 14.76,3 16.5,3 19.58,3 22,5.42 22,8.5c0,3.78 -3.4,6.86 -8.55,11.54L12,21.35z" />
+    </group>
 </vector>

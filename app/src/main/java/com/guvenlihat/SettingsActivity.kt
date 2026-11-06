@@ -294,6 +294,21 @@ class SettingsActivity : Activity() {
         root.addView(sw)
         note("Engellenen arama telefonda çalmaz, aileye bildirilir. 112 vb. arandıktan sonra 1 saat filtre kendiliğinden gevşer (geri arama için).")
 
+        // Sesli okuma
+        section("Sesli okuma")
+        @Suppress("DEPRECATION")
+        val tts = Switch(this)
+        tts.text = "Gelen aramada arayanın adını sesli söyle (\"Ayşe arıyor\")"
+        tts.textSize = 20f
+        tts.isChecked = prefs.announceCaller
+        tts.setOnCheckedChangeListener { _, checked ->
+            prefs.announceCaller = checked
+            if (checked) CallerAnnouncer.init(this)
+        }
+        root.addView(tts)
+        note("Telefon sessizdeyken okumaz. Ses, zil sesi seviyesinde çıkar.")
+        smallButton("Sesi dene") { testVoice() }
+
         // 6. Bildirim
         section("6. Aileye bildirim")
         choice(
@@ -442,6 +457,20 @@ class SettingsActivity : Activity() {
                 result.onFailure { Ui.info(this, "Hata", it.message ?: "Bağlantı hatası") }
             }
         }.start()
+    }
+
+    private fun testVoice() {
+        CallerAnnouncer.say(this, "Ayşe arıyor")
+        // Motor hazırlanırken biraz bekleyip Türkçe ses olup olmadığına bak
+        root.postDelayed({
+            if (CallerAnnouncer.turkishReady == false) {
+                Ui.info(
+                    this, "Türkçe ses bulunamadı",
+                    "Telefonda Türkçe metin okuma sesi yok. Play Store'dan \"Google Konuşma Hizmetleri\" " +
+                        "uygulamasını yükleyin veya güncelleyin, sonra tekrar deneyin.",
+                )
+            }
+        }, 2500)
     }
 
     private fun sendTest() {

@@ -14,6 +14,7 @@ class DialpadActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val root = Ui.column(this, 16)
+        root.setBackgroundColor(Ui.BG)
 
         intent?.data?.schemeSpecificPart?.let { pre ->
             number.append(pre.filter { it.isDigit() || it == '+' || it == '*' || it == '#' })
@@ -53,7 +54,7 @@ class DialpadActivity : Activity() {
     }
 
     private fun refresh() {
-        display.text = if (number.isEmpty()) "Numara girin" else number.toString()
+        display.text = if (number.isEmpty()) "Numara Girin" else number.toString()
         display.setTextColor(if (number.isEmpty()) Ui.GRAY else Ui.TEXT)
     }
 }

@@ -9,7 +9,6 @@ import android.provider.ContactsContract
 import android.text.Editable
 import android.text.InputType
 import android.text.TextWatcher
-import android.view.Gravity
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.Toast
@@ -44,10 +43,11 @@ class ContactsActivity : Activity() {
         pickMode = intent.getBooleanExtra(EXTRA_PICK, false)
 
         val root = Ui.column(this, 16)
-        root.addView(Ui.label(this, if (pickMode) "Kişi seçin" else "Rehber", 30f, Ui.TEXT, bold = true))
+        root.setBackgroundColor(Ui.BG)
+        root.addView(Ui.label(this, if (pickMode) "Kişi Seçin" else "Rehber", 30f, Ui.TEXT, bold = true))
 
         if (!pickMode) {
-            root.addView(Ui.button(this, "+  Yeni kişi ekle", Ui.GREEN, 24f) { addContact() })
+            root.addView(Ui.button(this, "+  Yeni Kişi Ekle", Ui.GREEN, 24f) { addContact() })
         }
 
         search = EditText(this)
@@ -124,10 +124,14 @@ class ContactsActivity : Activity() {
             return
         }
         for (e in shown) {
-            val text = if (e.hasName) "${e.name}\n${e.number}" else e.number
-            val b = Ui.button(this, text, Ui.BLUE, 24f) { onTap(e) }
-            b.gravity = Gravity.START or Gravity.CENTER_VERTICAL
-            list.addView(b)
+            // Uzun listede hız için fotoğraf yerine baş harf rozeti
+            val avatar = Ui.avatar(this, e.title, null, 52, Ui.BLUE_TINT, Ui.BLUE_DARK)
+            val item = if (e.hasName) {
+                Ui.listItem(this, avatar, e.name, e.number) { onTap(e) }
+            } else {
+                Ui.listItem(this, avatar, e.number, "İsimsiz Kayıt") { onTap(e) }
+            }
+            list.addView(item)
         }
     }
 

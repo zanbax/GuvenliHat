@@ -68,6 +68,21 @@ object PhoneUtils {
         }
     }
 
+    /** Rehberdeki küçük fotoğraf (varsa). Ek izin gerekmez, rehber izniyle gelir. */
+    fun photoUri(ctx: Context, number: String?): Uri? {
+        if (number.isNullOrBlank() || !hasContactsPermission(ctx)) return null
+        return try {
+            val uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(number))
+            ctx.contentResolver.query(
+                uri, arrayOf(ContactsContract.PhoneLookup.PHOTO_THUMBNAIL_URI), null, null, null,
+            )?.use { c ->
+                if (c.moveToFirst()) c.getString(0)?.let { Uri.parse(it) } else null
+            }
+        } catch (e: Exception) {
+            null
+        }
+    }
+
     /**
      * true: rehberde kayıtlı, false: kayıtlı değil (gizli numara dahil),
      * null: bilinemiyor (rehber izni yok). Bilinmiyorsa kimse engellenmez.

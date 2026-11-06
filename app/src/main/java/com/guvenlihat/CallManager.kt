@@ -203,6 +203,19 @@ object CallManager {
         calls.add(call)
         call.registerCallback(callback, main)
 
+        // Gelen aramada adı sesli oku (ayar açıksa): biraz zil çaldıktan sonra, iki kez
+        if (incoming && state == Call.STATE_RINGING && prefs.announceCaller) {
+            CallerAnnouncer.init(app)
+            val sentence = CallerAnnouncer.sentenceFor(app, number, unknown)
+            for (delay in longArrayOf(1_500L, 8_000L)) {
+                main.postAtTime(Runnable {
+                    if (infos[call] != null && stateOf(call) == Call.STATE_RINGING) {
+                        CallerAnnouncer.announce(app, sentence)
+                    }
+                }, call, SystemClock.uptimeMillis() + delay)
+            }
+        }
+
         if (fromChain) {
             main.postAtTime(Runnable {
                 if (infos[call]?.wasActive == false) call.disconnect()
@@ -215,6 +228,7 @@ object CallManager {
 
     fun onCallRemoved(call: Call) {
         call.unregisterCallback(callback)
+        CallerAnnouncer.stop()
         main.removeCallbacksAndMessages(call)
         calls.remove(call)
         val info = infos.remove(call)
@@ -246,6 +260,7 @@ object CallManager {
         val info = infos[call] ?: return
         when (state) {
             Call.STATE_ACTIVE -> if (!info.wasActive) {
+                if (info.incoming) CallerAnnouncer.stop()
                 info.wasActive = true
                 info.activeSince = SystemClock.elapsedRealtime()
                 if (info.fromChain) {

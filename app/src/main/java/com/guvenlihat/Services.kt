@@ -16,6 +16,8 @@ class App : Application() {
         CallNotification.createChannels(this)
         ContactsWatcher.register(this)
         ContactsWatcher.checkInBackground(this)
+        // Sesli okuma açıksa metin okuma motorunu önceden hazırla (ilk aramada gecikmesin)
+        if (Prefs(this).announceCaller) CallerAnnouncer.init(this)
     }
 }
 

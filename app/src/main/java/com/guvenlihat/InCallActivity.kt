@@ -25,6 +25,8 @@ class InCallActivity : Activity() {
     }
 
     private lateinit var bannerView: TextView
+    private lateinit var avatarBox: LinearLayout
+    private var avatarKey: String? = null
     private lateinit var nameView: TextView
     private lateinit var numberView: TextView
     private lateinit var stateView: TextView
@@ -61,11 +63,16 @@ class InCallActivity : Activity() {
         root.gravity = Gravity.CENTER_HORIZONTAL
 
         bannerView = Ui.label(this, "", 26f, Color.BLACK, bold = true)
-        bannerView.setBackgroundColor(Ui.YELLOW)
+        bannerView.background = Ui.cardBackground(this, Ui.YELLOW, Ui.YELLOW)
         bannerView.gravity = Gravity.CENTER
         val p = Ui.dp(this, 16)
         bannerView.setPadding(p, p, p, p)
         root.addView(bannerView, matchWidth())
+
+        avatarBox = LinearLayout(this)
+        avatarBox.gravity = Gravity.CENTER
+        avatarBox.setPadding(0, Ui.dp(this, 20), 0, Ui.dp(this, 8))
+        root.addView(avatarBox, matchWidth())
 
         nameView = centered(Ui.label(this, "", 34f, Color.WHITE, bold = true))
         numberView = centered(Ui.label(this, "", 22f, Ui.LIGHT))
@@ -143,6 +150,8 @@ class InCallActivity : Activity() {
 
         if (call == null) {
             nameView.text = ""
+            avatarBox.removeAllViews()
+            avatarKey = null
             numberView.text = ""
             stateView.text = ""
             timerView.text = ""
@@ -162,30 +171,42 @@ class InCallActivity : Activity() {
         val number = PhoneUtils.numberOf(call)
         val info = CallManager.info(call)
         val name = PhoneUtils.contactName(this, number) ?: PhoneUtils.safeName(Prefs(this), number)
-        nameView.text = name ?: (number ?: "Gizli numara")
+        nameView.text = name ?: (number ?: "Gizli Numara")
+        val suspicious = name == null && info?.unknown == true
+        val key = (number ?: "gizli") + suspicious
+        if (key != avatarKey) {
+            avatarKey = key
+            avatarBox.removeAllViews()
+            val av = if (suspicious) {
+                Ui.avatar(this, "!", null, 104, Ui.RED_TINT, Ui.RED)
+            } else {
+                Ui.avatar(this, name ?: "?", PhoneUtils.photoUri(this, number), 104, Ui.BLUE_TINT, Ui.BLUE_DARK)
+            }
+            avatarBox.addView(av)
+        }
         when {
             info?.recent == true -> {
-                numberView.text = "⚠ Rehbere yeni eklendi"
-                numberView.setTextColor(Ui.YELLOW)
+                numberView.text = "⚠ Rehbere Yeni Eklendi"
+                numberView.setTextColor(Ui.WARN_ON_DARK)
             }
             name != null -> {
                 numberView.text = number ?: ""
                 numberView.setTextColor(Ui.LIGHT)
             }
             info?.unknown == true -> {
-                numberView.text = "⚠ Rehberinizde kayıtlı değil"
-                numberView.setTextColor(Ui.YELLOW)
+                numberView.text = "⚠ Rehberinizde Kayıtlı Değil"
+                numberView.setTextColor(Ui.WARN_ON_DARK)
             }
             else -> numberView.text = ""
         }
 
         val state = CallManager.stateOf(call)
         stateView.text = when (state) {
-            Call.STATE_RINGING -> "Sizi arıyor"
+            Call.STATE_RINGING -> "Sizi Arıyor"
             Call.STATE_DIALING, Call.STATE_CONNECTING -> "Aranıyor..."
-            Call.STATE_ACTIVE -> "Görüşme sürüyor"
+            Call.STATE_ACTIVE -> "Görüşme Sürüyor"
             Call.STATE_HOLDING -> "Beklemede"
-            Call.STATE_SELECT_PHONE_ACCOUNT -> "Hangi hat ile aransın?"
+            Call.STATE_SELECT_PHONE_ACCOUNT -> "Hangi Hat İle Aransın?"
             Call.STATE_DISCONNECTING -> "Kapatılıyor..."
             else -> ""
         }
@@ -211,7 +232,7 @@ class InCallActivity : Activity() {
                 keypadBox.visibility = if (keypadOpen) View.VISIBLE else View.GONE
                 val row = Ui.row(this)
                 val speakerOn = CallManager.isSpeakerOn()
-                row.addView(Ui.weighted(Ui.button(this, if (speakerOn) "Hoparlör\nAÇIK" else "Hoparlör", if (speakerOn) Ui.GREEN else Ui.KEY, 18f) {
+                row.addView(Ui.weighted(Ui.button(this, if (speakerOn) "Hoparlör\nAçık" else "Hoparlör", if (speakerOn) Ui.GREEN else Ui.KEY, 18f) {
                     CallManager.toggleSpeaker()
                 }))
                 row.addView(Ui.weighted(Ui.button(this, "Tuşlar", if (keypadOpen) Ui.GREEN else Ui.KEY, 18f) {
@@ -219,7 +240,7 @@ class InCallActivity : Activity() {
                     render()
                 }))
                 val muted = CallManager.isMuted()
-                row.addView(Ui.weighted(Ui.button(this, if (muted) "Ses\nKAPALI" else "Sessiz", if (muted) Ui.RED else Ui.KEY, 18f) {
+                row.addView(Ui.weighted(Ui.button(this, if (muted) "Ses\nKapalı" else "Sessiz", if (muted) Ui.RED else Ui.KEY, 18f) {
                     CallManager.toggleMute()
                 }))
                 controls.addView(row)
