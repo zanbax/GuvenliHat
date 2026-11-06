@@ -368,6 +368,12 @@ class SettingsActivity : Activity() {
             smallButton("Deneme mesajı gönder", Ui.GREEN) { sendTest() }
         }
 
+        // Destek (deneme sürecinde testçiler için)
+        section("Destek")
+        note("Bir sorun olursa ya da görüşünüzü iletmek isterseniz: telefon bilgisi ve son olaylar otomatik eklenir, telefon numaraları gizlenir. Göndermeden önce içeriği görebilirsiniz.")
+        smallButton("Sorun bildir", Ui.ORANGE) { Support.reportProblem(this) }
+        smallButton("Geri bildirim gönder (anket)") { Support.sendFeedback(this) }
+
         // 7. PIN
         section("7. PIN")
         smallButton("PIN'i değiştir") { changePin() }

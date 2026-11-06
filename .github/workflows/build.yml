@@ -20,13 +20,26 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v4
 
+      - name: İmza anahtarını çöz
+        env:
+          SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
+        run: |
+          if [ -n "$SIGNING_PASSWORD" ]; then
+            openssl enc -d -aes-256-cbc -pbkdf2 -iter 200000 \
+              -in app/release.jks.enc -out app/release.jks -pass env:SIGNING_PASSWORD
+            echo "Kalıcı anahtarla imzalanacak"
+          else
+            echo "::warning::SIGNING_PASSWORD tanımlı değil; deneme anahtarıyla imzalanıyor"
+          fi
+
       - name: APK derle
+        env:
+          SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
         run: |
           chmod +x gradlew
-          ./gradlew assembleDebug --stacktrace
-
-      - name: APK'yı adlandır
-        run: cp app/build/outputs/apk/debug/app-debug.apk GuvenliHat.apk
+          ./gradlew assembleRelease --stacktrace
+          cp app/build/outputs/apk/release/app-release.apk GuvenliHat.apk
+          rm -f app/release.jks
 
       - name: APK'yı yükle
         uses: actions/upload-artifact@v4

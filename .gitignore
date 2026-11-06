@@ -6,3 +6,8 @@ local.properties
 *.iml
 .DS_Store
 captures/
+
+# Çözülmüş imza anahtarı asla depoya girmesin
+app/release.jks
+*.jks
+!app/debug.keystore

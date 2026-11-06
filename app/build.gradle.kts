@@ -12,8 +12,8 @@ android {
         minSdk = 24
         // 34: Android 15'in zorunlu kenardan kenara ekran düzenine girmemek için
         targetSdk = 34
-        versionCode = 6
-        versionName = "0.5.0"
+        versionCode = 7
+        versionName = "0.6.0"
     }
 
     // Sabit imza anahtarı: her yeni APK eskisinin üzerine güncelleme olarak kurulabilsin.
@@ -26,13 +26,32 @@ android {
         }
     }
 
+    // Kalıcı imza: anahtar depoda şifreli durur (release.jks.enc); GitHub derlemesi
+    // SIGNING_PASSWORD gizli değeriyle çözüp release.jks olarak kullanır.
+    val signingPassword: String? = System.getenv("SIGNING_PASSWORD")
+    val releaseKey = file("release.jks")
+    val hasReleaseKey = !signingPassword.isNullOrEmpty() && releaseKey.exists()
+    if (hasReleaseKey) {
+        signingConfigs.create("release") {
+            storeFile = releaseKey
+            storePassword = signingPassword
+            keyAlias = "guvenlihat"
+            keyPassword = signingPassword
+            storeType = "PKCS12"
+        }
+    }
+
     buildTypes {
         getByName("debug") {
             signingConfig = signingConfigs.getByName("debug")
         }
         getByName("release") {
             isMinifyEnabled = false
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = if (hasReleaseKey) {
+                signingConfigs.getByName("release")
+            } else {
+                signingConfigs.getByName("debug")
+            }
         }
     }
 
