@@ -32,6 +32,8 @@ object CallManager {
         val limited: Boolean,
         val fromChain: Boolean,
         val unknown: Boolean,
+        /** Rehbere son 24 saatte eklenmiş numara */
+        val recent: Boolean = false,
     ) {
         var activeSince = 0L
         var wasActive = false
@@ -159,10 +161,23 @@ object CallManager {
 
         val safe = PhoneUtils.isSafe(prefs, number)
         val unknown = PhoneUtils.isKnown(app, number) == false
+        // Rehberi şimdi tara: dolandırıcı "numaramı kaydet" dediyse az önce eklenmiş olabilir
+        if (!unknown && !safe && !emergency) ContactsWatcher.check(app)
+        val recent = !unknown && !safe && !emergency && ContactsWatcher.isRecentlyAdded(app, number)
         val fromChain = chainActive && !incoming && safe
         val limited = prefs.limitMinutes > 0 && !emergency && !safe && when (prefs.limitMode) {
-            LimitMode.UNKNOWN_ONLY -> unknown
+            LimitMode.UNKNOWN_ONLY -> unknown || recent
             LimitMode.ALL_EXCEPT_SAFE -> true
+        }
+
+        if (recent) {
+            val name = PhoneUtils.contactName(app, number) ?: ""
+            Notifier.send(
+                app,
+                "Rehbere son 24 saatte eklenen $name ($number) ile görüşme " +
+                    (if (incoming) "geliyor." else "başlatıyor."),
+                throttleKey = "recent_" + PhoneUtils.key(number), throttleMs = 30 * 60_000L,
+            )
         }
 
         if (!incoming && unknown && !emergency && !safe) {
@@ -174,7 +189,7 @@ object CallManager {
         // Zincir sürerken kişi başka birini ararsa zinciri bırak
         if (chainActive && !fromChain && !incoming) chainActive = false
 
-        val info = CallInfo(number, incoming, limited, fromChain, unknown)
+        val info = CallInfo(number, incoming, limited, fromChain, unknown, recent)
         infos[call] = info
         calls.add(call)
         call.registerCallback(callback, main)
@@ -270,7 +285,8 @@ object CallManager {
         val n = info.number ?: return "Gizli numara"
         if (info.unknown) return "$n (rehberde yok)"
         val name = PhoneUtils.contactName(app, n)
-        return if (name != null) "$name ($n)" else n
+        val tag = if (info.recent) ", rehbere yeni eklendi" else ""
+        return if (name != null) "$name ($n$tag)" else n
     }
 
     // ---------- Güvenli kişileri sırayla arama ----------

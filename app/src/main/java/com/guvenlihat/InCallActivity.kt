@@ -164,6 +164,10 @@ class InCallActivity : Activity() {
         val name = PhoneUtils.contactName(this, number) ?: PhoneUtils.safeName(Prefs(this), number)
         nameView.text = name ?: (number ?: "Gizli numara")
         when {
+            info?.recent == true -> {
+                numberView.text = "⚠ Rehbere yeni eklendi"
+                numberView.setTextColor(Ui.YELLOW)
+            }
             name != null -> {
                 numberView.text = number ?: ""
                 numberView.setTextColor(Ui.LIGHT)

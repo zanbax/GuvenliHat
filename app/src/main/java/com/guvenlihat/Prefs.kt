@@ -66,6 +66,11 @@ class Prefs(context: Context) {
         get() = sp.getLong("last_emergency", 0L)
         set(value) = sp.edit().putLong("last_emergency", value).apply()
 
+    /** Rehberin son görülen hali (ContactsWatcher kullanır). */
+    var contactSnapshot: String?
+        get() = sp.getString("contact_snapshot", null)
+        set(value) = sp.edit().putString("contact_snapshot", value).apply()
+
     var wasDefaultDialer: Boolean
         get() = sp.getBoolean("was_default_dialer", false)
         set(value) = sp.edit().putBoolean("was_default_dialer", value).apply()

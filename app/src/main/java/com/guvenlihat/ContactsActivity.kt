@@ -1,7 +1,9 @@
 package com.guvenlihat
 
+import android.Manifest
 import android.app.Activity
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.provider.ContactsContract
 import android.text.Editable
@@ -10,8 +12,14 @@ import android.text.TextWatcher
 import android.view.Gravity
 import android.widget.EditText
 import android.widget.LinearLayout
+import android.widget.Toast
 
-/** Büyük yazılı rehber. EXTRA_PICK ile açılırsa kişi seçip geri döner (ayarlar için). */
+/**
+ * Büyük yazılı rehber: arama, kişi ekleme, düzenleme ve silme.
+ * Ekleme ve düzenleme telefonun kendi Kişiler ekranında yapılır; her değişiklik
+ * ContactsWatcher tarafından aileye bildirilir.
+ * EXTRA_PICK ile açılırsa sadece kişi seçip geri döner (ayarlar için).
+ */
 class ContactsActivity : Activity() {
 
     companion object {
@@ -20,10 +28,11 @@ class ContactsActivity : Activity() {
         const val RESULT_NUMBER = "number"
     }
 
-    private data class Entry(val name: String, val number: String)
+    private data class Entry(val name: String, val number: String, val contactId: Long, val lookupKey: String?)
 
     private var all = listOf<Entry>()
     private lateinit var list: LinearLayout
+    private lateinit var search: EditText
     private var pickMode = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,7 +42,11 @@ class ContactsActivity : Activity() {
         val root = Ui.column(this, 16)
         root.addView(Ui.label(this, if (pickMode) "Kişi seçin" else "Rehber", 30f, Ui.TEXT, bold = true))
 
-        val search = EditText(this)
+        if (!pickMode) {
+            root.addView(Ui.button(this, "+  Yeni kişi ekle", Ui.GREEN, 24f) { addContact() })
+        }
+
+        search = EditText(this)
         search.hint = "İsim ile ara..."
         search.textSize = 24f
         search.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_WORDS
@@ -46,17 +59,21 @@ class ContactsActivity : Activity() {
         root.addView(Ui.button(this, "Geri", Ui.GRAY, 20f) { finish() })
         setContentView(root)
 
-        if (!PhoneUtils.hasContactsPermission(this)) {
-            list.addView(Ui.label(this, "Rehbere erişim izni yok. Ailenizden ayarları yapmasını isteyin.", 22f, Ui.RED))
-            return
-        }
-        all = load()
-        render("")
         search.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) = render(s?.toString() ?: "")
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Kişiler ekranından dönünce listeyi yenile ve değişiklikleri aileye bildir
+        if (PhoneUtils.hasContactsPermission(this)) {
+            all = load()
+            ContactsWatcher.checkInBackground(this)
+        }
+        render(search.text.toString())
     }
 
     private fun load(): List<Entry> {
@@ -68,6 +85,8 @@ class ContactsActivity : Activity() {
                 arrayOf(
                     ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
                     ContactsContract.CommonDataKinds.Phone.NUMBER,
+                    ContactsContract.CommonDataKinds.Phone.CONTACT_ID,
+                    ContactsContract.CommonDataKinds.Phone.LOOKUP_KEY,
                 ),
                 null, null,
                 ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + " COLLATE LOCALIZED ASC",
@@ -75,7 +94,9 @@ class ContactsActivity : Activity() {
                 while (c.moveToNext()) {
                     val name = c.getString(0) ?: continue
                     val number = c.getString(1) ?: continue
-                    if (seen.add(name + "|" + PhoneUtils.key(number))) out.add(Entry(name, number))
+                    if (seen.add(name + "|" + PhoneUtils.key(number))) {
+                        out.add(Entry(name, number, c.getLong(2), c.getString(3)))
+                    }
                 }
             }
         } catch (e: Exception) {
@@ -85,6 +106,10 @@ class ContactsActivity : Activity() {
 
     private fun render(query: String) {
         list.removeAllViews()
+        if (!PhoneUtils.hasContactsPermission(this)) {
+            list.addView(Ui.label(this, "Rehbere erişim izni yok. Ailenizden ayarları yapmasını isteyin.", 22f, Ui.RED))
+            return
+        }
         val q = query.trim()
         val shown = all.filter {
             q.isEmpty() || it.name.contains(q, ignoreCase = true) || it.number.contains(q)
@@ -94,18 +119,70 @@ class ContactsActivity : Activity() {
             return
         }
         for (e in shown) {
-            val b = Ui.button(this, "${e.name}\n${e.number}", Ui.BLUE, 24f) { onPick(e) }
+            val b = Ui.button(this, "${e.name}\n${e.number}", Ui.BLUE, 24f) { onTap(e) }
             b.gravity = Gravity.START or Gravity.CENTER_VERTICAL
             list.addView(b)
         }
     }
 
-    private fun onPick(e: Entry) {
+    private fun onTap(e: Entry) {
         if (pickMode) {
             setResult(RESULT_OK, Intent().putExtra(RESULT_NAME, e.name).putExtra(RESULT_NUMBER, e.number))
             finish()
+            return
+        }
+        Ui.actions(
+            this, "${e.name}\n${e.number}",
+            listOf(
+                Triple("📞  Ara", Ui.GREEN) { CallFlow.start(this, e.number) },
+                Triple("✏️  Düzenle", Ui.BLUE) { editContact(e) },
+                Triple("🗑  Sil", Ui.RED) { confirmDelete(e) },
+            ),
+        )
+    }
+
+    private fun lookupUri(e: Entry): Uri =
+        if (e.lookupKey != null) {
+            ContactsContract.Contacts.getLookupUri(e.contactId, e.lookupKey)
         } else {
-            CallFlow.start(this, e.number)
+            Uri.withAppendedPath(ContactsContract.Contacts.CONTENT_URI, e.contactId.toString())
+        }
+
+    private fun addContact() {
+        val i = Intent(Intent.ACTION_INSERT, ContactsContract.Contacts.CONTENT_URI)
+            .putExtra("finishActivityOnSaveCompleted", true)
+        startSafely(i)
+    }
+
+    private fun editContact(e: Entry) {
+        val i = Intent(Intent.ACTION_EDIT, lookupUri(e))
+            .putExtra("finishActivityOnSaveCompleted", true)
+        startSafely(i)
+    }
+
+    private fun confirmDelete(e: Entry) {
+        if (!PhoneUtils.has(this, Manifest.permission.WRITE_CONTACTS)) {
+            Ui.info(this, "İzin yok", "Kişi silme izni verilmemiş. Ailenizden ayarları yapmasını isteyin.")
+            return
+        }
+        Ui.ask(this, "Kişiyi sil", "${e.name} rehberden silinsin mi?\n\nBu işlem geri alınamaz.", yes = "Sil") {
+            val ok = try {
+                contentResolver.delete(lookupUri(e), null, null) > 0
+            } catch (ex: Exception) {
+                false
+            }
+            Toast.makeText(this, if (ok) "${e.name} silindi" else "Silinemedi", Toast.LENGTH_LONG).show()
+            all = load()
+            render(search.text.toString())
+            ContactsWatcher.checkInBackground(this)
+        }
+    }
+
+    private fun startSafely(i: Intent) {
+        try {
+            startActivity(i)
+        } catch (e: Exception) {
+            Toast.makeText(this, "Kişiler uygulaması açılamadı", Toast.LENGTH_LONG).show()
         }
     }
 }

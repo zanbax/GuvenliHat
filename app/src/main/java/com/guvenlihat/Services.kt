@@ -14,6 +14,8 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
         CallNotification.createChannels(this)
+        ContactsWatcher.register(this)
+        ContactsWatcher.checkInBackground(this)
     }
 }
 
@@ -56,6 +58,7 @@ class GuardScreeningService : CallScreeningService() {
             return
         }
         val number = PhoneUtils.numberOf(details)
+        ContactsWatcher.checkInBackground(this)
         val reason = try {
             CallManager.blockReason(this, number)
         } catch (e: Exception) {

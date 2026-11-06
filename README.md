@@ -12,6 +12,9 @@ Yaşlıları telefon dolandırıcılığından korumak için Android uygulaması
 | **Geri arama engeli** | Kesilen numara bir süre (varsayılan 1 saat) ne arayabilir ne de aranabilir. Dolandırıcıların "hat kesilirse beni hemen geri ara" taktiğine karşı. |
 | **Aileye bildirim** | Kuruluma göre SMS ya da Telegram ile şunlar bildirilir: engellenen aramalar, rehber dışı bir numaranın aranması, uzun görüşme (sürenin yarısında), kesilen görüşme, ayarların açılması. |
 | **"Rehberde yok" uyarısı** | Korunan kişi kayıtlı olmayan bir numarayı aramak isterse önce uyarılır. |
+| **Rehber yönetimi** | Rehber ekranından kişi eklenebilir, düzenlenebilir ve silinebilir. |
+| **Rehber değişikliği bildirimi** | Rehbere kişi eklenince, silinince veya bir kişinin numarası değişince aileye haber gider. Değişiklik telefonun kendi Kişiler uygulamasından yapılsa bile yakalanır. |
+| **Yeni kişi kuralı (24 saat)** | Son 24 saatte rehbere eklenen numara aranamaz hale gelmez ama bilinmeyen numara gibi süre sınırına girer. Görüşme ekranında "Rehbere yeni eklendi" uyarısı çıkar, aileye de haber gider. Dolandırıcının "numaramı rehberine kaydet" taktiğine karşı. |
 | **PIN koruması** | Ayarlar aile PIN'i olmadan açılamaz. |
 | **Yaşlı dostu arayüz** | Büyük düğmeli ana ekran, rehber, son aramalar ve tuş takımı. Görüşme sırasında hoparlör, sessiz ve tuşlar düğmeleri var. |
 

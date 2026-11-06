@@ -57,6 +57,7 @@ object Setup {
     fun neededPermissions(prefs: Prefs): List<String> {
         val list = mutableListOf(
             Manifest.permission.READ_CONTACTS,
+            Manifest.permission.WRITE_CONTACTS,
             Manifest.permission.CALL_PHONE,
             Manifest.permission.READ_CALL_LOG,
             Manifest.permission.READ_PHONE_STATE,

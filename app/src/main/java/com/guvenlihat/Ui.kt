@@ -118,6 +118,21 @@ object Ui {
         dialog.getButton(AlertDialog.BUTTON_NEGATIVE)?.textSize = 22f
     }
 
+    /** Büyük düğmeli seçenek penceresi (Ara / Düzenle / Sil gibi). */
+    fun actions(act: Activity, title: String, items: List<Triple<String, Int, () -> Unit>>) {
+        val box = column(act, 16)
+        box.addView(label(act, title, 24f, TEXT, bold = true))
+        val dialog = AlertDialog.Builder(act).setView(scroll(act, box)).create()
+        for ((text, color, action) in items) {
+            box.addView(button(act, text, color, 24f) {
+                dialog.dismiss()
+                action()
+            })
+        }
+        box.addView(button(act, "Vazgeç", GRAY, 20f) { dialog.dismiss() })
+        dialog.show()
+    }
+
     fun info(act: Activity, title: String, message: String) {
         val body = label(act, message, 22f)
         val p = dp(act, 20)

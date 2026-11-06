@@ -19,6 +19,7 @@ class MainActivity : Activity() {
     override fun onResume() {
         super.onResume()
         checkProtectionLost()
+        ContactsWatcher.checkInBackground(this)
         build()
     }
 
