@@ -171,6 +171,19 @@ class SettingsActivity : Activity() {
 
         // 1. Kurulum
         section("1. Kurulum")
+        val needsRestricted = !Setup.isDefaultDialer(this) ||
+            (prefs.notifyMethod == NotifyMethod.SMS && !PhoneUtils.has(this, Manifest.permission.SEND_SMS))
+        if (Build.VERSION.SDK_INT >= 33 && needsRestricted) {
+            root.addView(
+                Ui.label(
+                    this,
+                    "\"Erişim reddedildi\" uyarısı çıkarsa: Uygulama bilgisi sayfasında sağ üstteki ⋮ menüsünden " +
+                        "\"Kısıtlanmış ayarlara izin ver\"i seçin, sonra buraya dönüp tekrar deneyin.",
+                    18f, Ui.RED,
+                ),
+            )
+            smallButton("Uygulama bilgisini aç", Ui.GRAY) { Setup.openAppDetails(this) }
+        }
         statusRow("Varsayılan telefon uygulaması", Setup.isDefaultDialer(this), "Güvenli Hat'ı varsayılan yap") {
             Setup.requestDefaultDialer(this, RC_DIALER)
         }
