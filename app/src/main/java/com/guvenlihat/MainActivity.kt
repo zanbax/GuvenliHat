@@ -69,10 +69,12 @@ class MainActivity : Activity() {
         root.addView(bottomBar)
 
         setContentView(root)
+        Ui.edgeToEdge(this, root)
     }
 
     override fun onResume() {
         super.onResume()
+        if (Prefs(this).consentAt == 0L) showConsent()
         checkProtectionLost()
         CareMonitor.markActive(this)
         ContactsWatcher.checkInBackground(this)
@@ -274,6 +276,51 @@ class MainActivity : Activity() {
         return card
     }
 
+    // ---------------- İlk açılış: bilgilendirme ve onay ----------------
+
+    private var consentShowing = false
+
+    /**
+     * Korunan kişinin kendi telefonunda, neyin yapıldığını ve kimle neyin paylaşıldığını
+     * sade bir dille anlatır ve onayını alır (Google Play "belirgin açıklama" şartı da budur).
+     */
+    private fun showConsent() {
+        if (consentShowing) return
+        consentShowing = true
+        val text = StringBuilder()
+        text.append("Güvenli Hat sizi telefon dolandırıcılığından korur. Bunun için:\n\n")
+        text.append("• Rehberinizi ve arama kayıtlarınızı telefonunuzda okur. Bunlar internete gönderilmez.\n\n")
+        text.append("• Rehberde olmayan numaraların aramalarını engeller, tanımadığınız biriyle uzun görüşmeleri keser ve bir yakınınızı arar.\n\n")
+        text.append("• Engellenen aramaları, kesilen görüşmeleri, rehber değişikliklerini ve Yardım çağrılarını, arayan numarayla birlikte, seçtiğiniz yakınlarınıza SMS veya Telegram ile bildirir.\n\n")
+        if (BuildConfig.CARE_FEATURES) {
+            text.append("• Aileniz açarsa: konumunuzu ve telefonu en son ne zaman kullandığınızı yakınlarınızla paylaşır. Konum her paylaşıldığında telefonunuzda bildirim görürsünüz.\n\n")
+        }
+        text.append("Ayarları aileniz yapar. Uygulamayı istediğiniz zaman kaldırabilirsiniz.")
+        val body = Ui.label(this, text.toString(), 19f)
+        val p = Ui.dp(this, 20)
+        body.setPadding(p, p, p, p)
+        val dialog = android.app.AlertDialog.Builder(this)
+            .setTitle("Güvenli Hat ne yapar?")
+            .setView(Ui.scroll(this, body))
+            .setCancelable(false)
+            .setPositiveButton("Anladım, kabul ediyorum") { _, _ ->
+                consentShowing = false
+                Prefs(this).consentAt = System.currentTimeMillis()
+                Prefs(this).addEvent("Korunan kişi bilgilendirme ekranını kabul etti.")
+            }
+            .setNegativeButton("Kabul etmiyorum") { _, _ ->
+                consentShowing = false
+                Ui.info(
+                    this, "Koruma çalışmayacak",
+                    "Kabul etmeden Güvenli Hat sizi koruyamaz. Uygulamayı bir sonraki açışınızda bu ekran tekrar gelecek. " +
+                        "İsterseniz ailenizle konuşup uygulamayı kaldırabilirsiniz.",
+                )
+            }
+            .show()
+        dialog.getButton(android.app.AlertDialog.BUTTON_POSITIVE)?.textSize = 18f
+        dialog.getButton(android.app.AlertDialog.BUTTON_NEGATIVE)?.textSize = 18f
+    }
+
     // ---------------- Yardım (SOS) ----------------
 
     /**
@@ -391,10 +438,14 @@ class MainActivity : Activity() {
             this,
             "🆘 YARDIM İSTEDİ! Telefonundaki Yardım düğmesine bastı." +
                 (if (first != null) " ${first.name} aranıyor." else "") + " Konum birkaç saniye içinde gelecek.",
+            userInitiated = true,
         )
         val app = applicationContext
         CareMonitor.getLocation(app) { loc ->
-            Notifier.send(app, "🆘 Yardım isteyenin konumu: " + CareMonitor.locationText(loc) + " " + CareMonitor.batteryText(app))
+            Notifier.send(
+                app, "🆘 Yardım isteyenin konumu: " + CareMonitor.locationText(loc) + " " + CareMonitor.batteryText(app),
+                userInitiated = true,
+            )
         }
         CallManager.startHelp(this)
         build()
@@ -404,7 +455,7 @@ class MainActivity : Activity() {
         val prefs = Prefs(this)
         prefs.helpSentAt = 0L
         CallManager.cancelHelp()
-        Notifier.send(this, "✓ Yardım düğmesine yanlışlıkla basılmış, sorun yok.")
+        Notifier.send(this, "✓ Yardım düğmesine yanlışlıkla basılmış, sorun yok.", userInitiated = true)
         build()
     }
 

@@ -49,7 +49,9 @@ class DialpadActivity : Activity() {
 
         root.addView(Ui.button(this, "Geri", Ui.GRAY, 20f) { finish() })
 
-        setContentView(Ui.scroll(this, root))
+        val sc = Ui.scroll(this, root)
+        setContentView(sc)
+        Ui.edgeToEdge(this, sc)
         refresh()
     }
 

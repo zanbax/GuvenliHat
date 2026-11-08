@@ -31,6 +31,7 @@ class RecentsActivity : Activity() {
         root.addView(scroll)
         root.addView(Ui.button(this, "Geri", Ui.GRAY, 20f) { finish() })
         setContentView(root)
+        Ui.edgeToEdge(this, root)
     }
 
     override fun onResume() {

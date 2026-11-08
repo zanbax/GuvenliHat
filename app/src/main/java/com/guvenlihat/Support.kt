@@ -98,6 +98,7 @@ object Support {
         val sb = StringBuilder()
         sb.append("--- Telefon ---\n").append(deviceInfo(act))
         sb.append("\n--- Kurulum ---\n")
+        sb.append("Korunan kişinin onayı: ${yesNo(prefs.consentAt > 0L)}\n")
         sb.append("Varsayılan telefon uygulaması: ${yesNo(Setup.isDefaultDialer(act))}\n")
         sb.append("Eksik izinler: ${if (missing.isEmpty()) "yok" else missing.joinToString { it.substringAfterLast('.') }}\n")
         sb.append("Sessiz engelleme: ${yesNo(Setup.hasScreeningRole(act))}\n")

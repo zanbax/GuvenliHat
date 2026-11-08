@@ -11,7 +11,10 @@ import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.RippleDrawable
 import android.graphics.Outline
 import android.net.Uri
+import android.os.Build
 import android.view.Gravity
+import android.view.WindowInsets
+import android.view.WindowInsetsController
 import android.view.View
 import android.view.ViewOutlineProvider
 import android.widget.Button
@@ -49,6 +52,30 @@ object Ui {
     val PURPLE_TINT = Color.parseColor("#ECE8F8")
     val AMBER = Color.parseColor("#9A5B00")
     val AMBER_TINT = Color.parseColor("#FCEFD8")
+
+    /**
+     * Android 15+ (hedef API 35+) ekranı kenardan kenara çizer: içerik durum çubuğunun
+     * ve alttaki gezinme çubuğunun altına kaçmasın diye kenar boşluğu ekler.
+     * light = açık zeminli ekran (durum çubuğu simgeleri koyu olsun).
+     */
+    fun edgeToEdge(act: Activity, root: View, light: Boolean = true) {
+        if (Build.VERSION.SDK_INT < 35) return
+        val l = root.paddingLeft
+        val t = root.paddingTop
+        val r = root.paddingRight
+        val b = root.paddingBottom
+        root.setOnApplyWindowInsetsListener { v, insets ->
+            val bars = insets.getInsets(WindowInsets.Type.systemBars() or WindowInsets.Type.ime() or WindowInsets.Type.displayCutout())
+            v.setPadding(l + bars.left, t + bars.top, r + bars.right, b + bars.bottom)
+            insets
+        }
+        try {
+            val flags = WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS or WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS
+            act.window.insetsController?.setSystemBarsAppearance(if (light) flags else 0, flags)
+        } catch (e: Exception) {
+        }
+        root.requestApplyInsets()
+    }
 
     fun dp(ctx: Context, v: Int): Int = (v * ctx.resources.displayMetrics.density + 0.5f).toInt()
 

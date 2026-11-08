@@ -98,6 +98,7 @@ class InCallActivity : Activity() {
         root.addView(controls, matchWidth())
 
         setContentView(root)
+        Ui.edgeToEdge(this, root, light = false)
         CallManager.addListener(listener)
         handleIntent(intent)
     }

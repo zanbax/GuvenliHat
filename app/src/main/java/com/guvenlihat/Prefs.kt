@@ -72,6 +72,11 @@ class Prefs(context: Context) {
         get() = sp.getLong("last_emergency", 0L)
         set(value) = sp.edit().putLong("last_emergency", value).apply()
 
+    /** İlk açılışta bilgilendirme ve onay ekranı kabul edildi mi (zaman damgası, 0 = hayır) */
+    var consentAt: Long
+        get() = sp.getLong("consent_at", 0L)
+        set(value) = sp.edit().putLong("consent_at", value).apply()
+
     // ---------- Güvenlik uyarıları ----------
 
     var helpButtonEnabled: Boolean

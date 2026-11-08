@@ -36,7 +36,9 @@ class SettingsActivity : Activity() {
         super.onCreate(savedInstanceState)
         prefs = Prefs(this)
         root = Ui.column(this, 16)
-        setContentView(Ui.scroll(this, root))
+        val sc = Ui.scroll(this, root)
+        setContentView(sc)
+        Ui.edgeToEdge(this, sc)
         unlocked = savedInstanceState?.getBoolean("unlocked") == true
         if (!unlocked) showPinGate()
     }
@@ -197,6 +199,12 @@ class SettingsActivity : Activity() {
         if (!Setup.isDefaultDialer(this)) {
             smallButton("Çıkmazsa: Varsayılan uygulamalar ayarını aç", Ui.GRAY) { Setup.openDefaultApps(this) }
         }
+        statusRow("Korunan kişinin onayı", prefs.consentAt > 0L, "Onay ekranını göster") {
+            startActivity(Intent(this, MainActivity::class.java))
+        }
+        if (prefs.consentAt == 0L) {
+            note("Korunan kişi ana ekrandaki bilgilendirmeyi kabul edene kadar aileye bildirim gönderilmez.")
+        }
         val missing = Setup.missingPermissions(this, prefs)
         statusRow("İzinler", missing.isEmpty(), "İzinleri ver") {
             requestPermissions(missing.toTypedArray(), RC_PERMS)
@@ -210,6 +218,7 @@ class SettingsActivity : Activity() {
             }
         }
         statusRow("Pil kısıtlaması kaldırıldı", Setup.isIgnoringBattery(this), "Kısıtlamayı kaldır") {
+            toast("Listede Güvenli Hat'ı bulun ve \"Kısıtlama yok\" / \"Optimize etme\" seçin")
             Setup.requestIgnoreBattery(this)
         }
         if (Setup.isXiaomi()) {
@@ -389,6 +398,8 @@ class SettingsActivity : Activity() {
         }
         switchRow("Telefon yeniden açılınca haber ver", prefs.bootAlert) { prefs.bootAlert = it }
 
+        // Bakım: hareketsizlik ve konum (sadece tam sürümde; Play sürümünde yok)
+        if (BuildConfig.CARE_FEATURES) {
         // Bakım: hareketsizlik ve konum (isteğe bağlı, varsayılanda kapalı)
         section("Bakım: hareketsizlik ve konum")
         note("İsteğe bağlıdır. Açmadan önce korunan kişiye anlatın ve onayını alın.")
@@ -484,6 +495,8 @@ class SettingsActivity : Activity() {
                 CareMonitor.sendLocationNow(this)
                 toast("Konum alınıyor ve gönderiliyor...")
             }
+        }
+
         }
 
         // Destek (deneme sürecinde testçiler için)

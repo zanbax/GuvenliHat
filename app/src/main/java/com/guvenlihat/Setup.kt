@@ -77,9 +77,9 @@ object Setup {
         false
     }
 
+    /** Pil optimizasyonu listesini açar; kullanıcı Güvenli Hat'ı kendisi "Kısıtlama yok" yapar. */
     fun requestIgnoreBattery(act: Activity) {
-        val i = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS, Uri.parse("package:" + act.packageName))
-        if (!tryStart(act, i)) openAppDetails(act)
+        if (!tryStart(act, Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS))) openAppDetails(act)
     }
 
     fun isXiaomi(): Boolean = listOf("xiaomi", "redmi", "poco").any {

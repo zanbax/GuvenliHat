@@ -62,6 +62,7 @@ class ContactsActivity : Activity() {
         root.addView(scroll)
         root.addView(Ui.button(this, "Geri", Ui.GRAY, 20f) { finish() })
         setContentView(root)
+        Ui.edgeToEdge(this, root)
 
         search.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) = render(s?.toString() ?: "")

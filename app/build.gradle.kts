@@ -5,15 +5,15 @@ plugins {
 
 android {
     namespace = "com.guvenlihat"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.guvenlihat"
         minSdk = 24
-        // 34: Android 15'in zorunlu kenardan kenara ekran düzenine girmemek için
-        targetSdk = 34
-        versionCode = 14
-        versionName = "0.8.1"
+        // Google Play: yeni uygulamalar ve güncellemeler Android 16'yı (API 36) hedeflemeli
+        targetSdk = 36
+        versionCode = 15
+        versionName = "0.9.0"
     }
 
     // Sabit imza anahtarı: her yeni APK eskisinin üzerine güncelleme olarak kurulabilsin.
@@ -52,6 +52,26 @@ android {
             } else {
                 signingConfigs.getByName("debug")
             }
+        }
+    }
+
+    buildFeatures {
+        buildConfig = true
+    }
+
+    // İki sürüm, tek kod:
+    //  full: bütün özellikler (APK, testçilere doğrudan dağıtım)
+    //  play: çekirdek özellikler (AAB, Google Play). Konum, hareketsizlik, kullanım erişimi
+    //        ve tam zamanlı alarm izinleri bu sürümde yok (src/play/AndroidManifest.xml).
+    flavorDimensions += "dagitim"
+    productFlavors {
+        create("full") {
+            dimension = "dagitim"
+            buildConfigField("boolean", "CARE_FEATURES", "true")
+        }
+        create("play") {
+            dimension = "dagitim"
+            buildConfigField("boolean", "CARE_FEATURES", "false")
         }
     }
 

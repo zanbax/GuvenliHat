@@ -37,15 +37,18 @@ jobs:
           SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
         run: |
           chmod +x gradlew
-          ./gradlew assembleRelease --stacktrace
-          cp app/build/outputs/apk/release/app-release.apk GuvenliHat.apk
+          ./gradlew assembleFullRelease bundlePlayRelease --stacktrace
+          cp app/build/outputs/apk/full/release/app-full-release.apk GuvenliHat.apk
+          cp app/build/outputs/bundle/playRelease/app-play-release.aab GuvenliHat-play.aab
           rm -f app/release.jks
 
       - name: APK'yı yükle
         uses: actions/upload-artifact@v4
         with:
           name: GuvenliHat-apk
-          path: GuvenliHat.apk
+          path: |
+            GuvenliHat.apk
+            GuvenliHat-play.aab
 
       - name: Sürümler (Releases) sayfasına koy
         if: github.ref == 'refs/heads/main'
@@ -53,6 +56,8 @@ jobs:
         with:
           tag_name: v0.1.${{ github.run_number }}
           name: Güvenli Hat 0.1.${{ github.run_number }}
-          body: Telefondan GuvenliHat.apk dosyasına dokunup indirin ve kurun. Eski sürümün üzerine kurulur, ayarlar silinmez.
-          files: GuvenliHat.apk
+          body: "GuvenliHat.apk: tam sürüm (testçiler için, telefondan indirip kurun). GuvenliHat-play.aab: Google Play'e yüklenecek çekirdek sürüm."
+          files: |
+            GuvenliHat.apk
+            GuvenliHat-play.aab
           make_latest: true

@@ -22,12 +22,21 @@ object Notifier {
      * @param throttleKey aynı anahtarla [throttleMs] içinde tekrar mesaj atılmaz
      *                    (ör. dolandırıcı aynı numaradan 20 kez ararsa 20 SMS gitmesin).
      */
-    fun send(ctx: Context, text: String, throttleKey: String? = null, throttleMs: Long = 10 * 60_000L) {
+    /** @param userInitiated korunan kişinin kendisinin başlattığı gönderim (Yardım düğmesi): onay beklemez */
+    fun send(
+        ctx: Context, text: String, throttleKey: String? = null, throttleMs: Long = 10 * 60_000L,
+        userInitiated: Boolean = false,
+    ) {
         val app = ctx.applicationContext
         val prefs = Prefs(app)
         prefs.addEvent(text)
         if (throttleKey != null && !prefs.shouldNotify(throttleKey, throttleMs)) return
         if (prefs.notifyMethod == NotifyMethod.NONE) return
+        // Korunan kişi bilgilendirme ekranını kabul etmeden dışarıya hiçbir şey gönderilmez
+        if (prefs.consentAt == 0L && !userInitiated) {
+            prefs.addEvent("(Gönderilmedi: korunan kişinin onayı bekleniyor)")
+            return
+        }
         executor.execute {
             var error: String? = null
             for (attempt in 1..3) {
