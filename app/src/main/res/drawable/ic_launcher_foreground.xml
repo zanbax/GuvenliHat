@@ -1,16 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Uyarlanabilir simgenin ön katmanı: güvenli alan içinde ahize + kalkan içinde kalp -->
+<!-- Uyarlanabilir simgenin ön katmanı: içinde ahize olan beyaz kalp ve ona yaslanan küçük sarı kalp -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp" android:height="108dp"
     android:viewportWidth="108" android:viewportHeight="108">
-    <group android:scaleX="1.65" android:scaleY="1.65" android:translateX="29" android:translateY="31">
-        <path android:fillColor="#FFFFFFFF" android:pathData="M6.62,10.79c1.44,2.83 3.76,5.14 6.59,6.59l2.2,-2.2c0.27,-0.27 0.67,-0.36 1.02,-0.24 1.12,0.37 2.33,0.57 3.57,0.57 0.55,0 1,0.45 1,1V20c0,0.55 -0.45,1 -1,1 -9.39,0 -17,-7.61 -17,-17 0,-0.55 0.45,-1 1,-1h3.5c0.55,0 1,0.45 1,1 0,1.25 0.2,2.45 0.57,3.57 0.11,0.35 0.03,0.74 -0.25,1.02l-2.2,2.2z" />
-    </group>
-    <path android:fillColor="#FFFFFFFF" android:pathData="M55.5,68a12.5,12.5 0 1,0 25,0a12.5,12.5 0 1,0 -25,0z" />
-    <group android:scaleX="0.7" android:scaleY="0.7" android:translateX="59.6" android:translateY="59.3">
-        <path android:fillColor="#FF2F7D57" android:pathData="M12,1L3,5v6c0,5.55 3.84,10.74 9,12 5.16,-1.26 9,-6.45 9,-12V5l-9,-4z" />
-    </group>
-    <group android:scaleX="0.32" android:scaleY="0.32" android:translateX="64.2" android:translateY="63.6">
-        <path android:fillColor="#FFFFFFFF" android:pathData="M12,21.35l-1.45,-1.32C5.4,15.36 2,12.28 2,8.5 2,5.42 4.42,3 7.5,3c1.74,0 3.41,0.81 4.5,2.09C13.09,3.81 14.76,3 16.5,3 19.58,3 22,5.42 22,8.5c0,3.78 -3.4,6.86 -8.55,11.54L12,21.35z" />
-    </group>
+    <path android:fillColor="#FFFFFFFF"
+        android:pathData="M48.28,72.179 C33.782,61.519 26.96,53.844 26.96,45.742 C26.96,39.773 32.077,35.509 37.62,35.509 C42.737,35.509 46.148,38.494 48.28,42.331 C50.412,38.494 53.823,35.509 58.94,35.509 C64.483,35.509 69.6,39.773 69.6,45.742 C69.6,53.844 62.778,61.519 48.28,72.179 Z" />
+    <path android:fillColor="#FF34A065"
+        android:pathData="M43.804,53.825 C45.002,56.18 46.932,58.102 49.287,59.308 L51.117,57.478 C51.342,57.253 51.675,57.178 51.966,57.278 C52.898,57.586 53.904,57.752 54.936,57.752 C55.394,57.752 55.768,58.127 55.768,58.584 L55.768,61.488 C55.768,61.946 55.394,62.32 54.936,62.32 C47.124,62.32 40.792,55.988 40.792,48.176 C40.792,47.718 41.166,47.344 41.624,47.344 L44.536,47.344 C44.994,47.344 45.368,47.718 45.368,48.176 C45.368,49.216 45.534,50.214 45.842,51.146 C45.934,51.437 45.867,51.762 45.634,51.995 L43.804,53.825 Z" />
+    <path android:fillColor="#FFF2C14E" android:strokeColor="#FF34A065" android:strokeWidth="1.872" android:strokeLineJoin="round"
+        android:pathData="M68.044,71.878 C62.208,65.321 59.731,60.967 60.553,57.101 C61.158,54.253 64.032,52.737 66.677,53.3 C69.118,53.819 70.443,55.589 71.071,57.636 C72.478,56.021 74.408,54.943 76.85,55.462 C79.495,56.024 81.504,58.578 80.898,61.426 C80.077,65.292 76.043,68.262 68.044,71.878 Z" />
 </vector>
