@@ -104,6 +104,19 @@ object Ui {
         return b
     }
 
+    /** Yan yana dar düğmeler: az iç boşluk, sığmazsa yazı küçülür, kelime ortadan bölünmez. */
+    fun compact(b: Button, maxSp: Float = 18f): Button {
+        val ctx = b.context
+        b.setPadding(dp(ctx, 4), dp(ctx, 10), dp(ctx, 4), dp(ctx, 10))
+        b.maxLines = 2
+        if (Build.VERSION.SDK_INT >= 26) {
+            b.setAutoSizeTextTypeUniformWithConfiguration(12, maxSp.toInt(), 1, android.util.TypedValue.COMPLEX_UNIT_SP)
+        } else {
+            b.textSize = maxSp - 2f
+        }
+        return b
+    }
+
     fun label(
         ctx: Context, s: String, size: Float = 20f, color: Int = TEXT, bold: Boolean = false,
     ): TextView {

@@ -9,6 +9,7 @@
     <style name="CallTheme" parent="@android:style/Theme.Material.NoActionBar">
         <item name="android:windowBackground">#1B2733</item>
         <item name="android:statusBarColor">#1B2733</item>
+        <item name="android:navigationBarColor">#1B2733</item>
         <item name="android:colorAccent">#FFD54F</item>
     </style>
 </resources>

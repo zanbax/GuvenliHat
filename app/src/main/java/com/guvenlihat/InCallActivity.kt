@@ -233,17 +233,17 @@ class InCallActivity : Activity() {
                 keypadBox.visibility = if (keypadOpen) View.VISIBLE else View.GONE
                 val row = Ui.row(this)
                 val speakerOn = CallManager.isSpeakerOn()
-                row.addView(Ui.weighted(Ui.button(this, if (speakerOn) "Hoparlör\nAçık" else "Hoparlör", if (speakerOn) Ui.GREEN else Ui.KEY, 18f) {
+                row.addView(Ui.weighted(Ui.compact(Ui.button(this, if (speakerOn) "Hoparlör\nAçık" else "Hoparlör", if (speakerOn) Ui.GREEN else Ui.KEY, 18f) {
                     CallManager.toggleSpeaker()
-                }))
-                row.addView(Ui.weighted(Ui.button(this, "Tuşlar", if (keypadOpen) Ui.GREEN else Ui.KEY, 18f) {
+                })))
+                row.addView(Ui.weighted(Ui.compact(Ui.button(this, "Tuşlar", if (keypadOpen) Ui.GREEN else Ui.KEY, 18f) {
                     keypadOpen = !keypadOpen
                     render()
-                }))
+                })))
                 val muted = CallManager.isMuted()
-                row.addView(Ui.weighted(Ui.button(this, if (muted) "Ses\nKapalı" else "Sessiz", if (muted) Ui.RED else Ui.KEY, 18f) {
+                row.addView(Ui.weighted(Ui.compact(Ui.button(this, if (muted) "Ses\nKapalı" else "Sessiz", if (muted) Ui.RED else Ui.KEY, 18f) {
                     CallManager.toggleMute()
-                }))
+                })))
                 controls.addView(row)
                 controls.addView(Ui.button(this, "Kapat", Ui.RED, 32f) { CallManager.hangup() })
             }
