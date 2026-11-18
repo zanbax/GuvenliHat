@@ -1,6 +1,18 @@
-# Güvenli Hat
+# WeAreNear
 
-Yaşlıları telefon dolandırıcılığından korumak için Android uygulaması. Sürüm 0.1, 1. aşama.
+Yaşlıları telefon dolandırıcılığından korumak için Android uygulaması. Eski adı **Güvenli Hat**.
+
+- Paket adı: `app.wearenear` (eski: `com.guvenlihat`)
+- Alan adı: [wearenear.app](https://wearenear.app)
+
+### Güvenli Hat'tan WeAreNear'a geçiş
+
+Android yeni paket adını ayrı bir uygulama sayar; eski uygulama kendiliğinden güncellenmez.
+
+1. Eski Güvenli Hat'ı kullananlara önce `GuvenliHat-son-guncelleme.apk` kurulur (eskisinin üzerine güncelleme). Ana ekranda yeni adı ve ne yapılacağını anlatan bir kart çıkar.
+2. `WeAreNear.apk` kurulur, açılır, varsayılan telefon uygulaması yapılır ve ayarlar (güvenilir kişiler, bildirim yöntemi, PIN) yeniden girilir.
+3. WeAreNear varsayılan olunca eski uygulama susar: aileye mesaj göndermez, konum/hareketsizlik/pil kontrollerini durdurur. Böylece çift mesaj gitmez.
+4. Eski uygulama, ana ekrandaki "Eski Uygulamayı Kaldır" düğmesiyle silinir.
 
 ## Ne yapar?
 
@@ -41,7 +53,7 @@ Acil numaralar (112, 155, 110...) aranırken asla kesilmez. 112 arandıktan sonr
 3. Depo sayfasında **"uploading an existing file"** bağlantısına tıklayın. Bu zip'in içindeki **bütün dosya ve klasörleri** sürükleyip bırakın, sonra **Commit changes** deyin.
    - Önemli: `.github` klasörü gizli klasördür. Bilgisayarınızda görünmüyorsa gizli dosyaları gösterin, yoksa otomatik derleme çalışmaz.
 4. **Actions** sekmesine geçin. "APK oluştur" işi kendiliğinden başlar ve 3-5 dakika sürer. Başlamazsa **Run workflow** düğmesine basın.
-5. İş yeşil tik alınca deponun ana sayfasında sağdaki **Releases** bölümüne girin ve en üstteki sürümden `GuvenliHat.apk` dosyasını indirin. Bunu doğrudan telefondan da yapabilirsiniz.
+5. İş yeşil tik alınca deponun ana sayfasında sağdaki **Releases** bölümüne girin ve en üstteki sürümden `WeAreNear.apk` dosyasını indirin. Bunu doğrudan telefondan da yapabilirsiniz.
 
 ### Yol B: Android Studio ile
 

@@ -30,6 +30,8 @@ object Notifier {
         val app = ctx.applicationContext
         val prefs = Prefs(app)
         prefs.addEvent(text)
+        // Eski uygulama, görevi WeAreNear'a devrettiyse susar (aileye aynı mesaj iki kez gitmesin)
+        if (Migration.retired(app)) return
         if (throttleKey != null && !prefs.shouldNotify(throttleKey, throttleMs)) return
         if (prefs.notifyMethod == NotifyMethod.NONE) return
         // Korunan kişi bilgilendirme ekranını kabul etmeden dışarıya hiçbir şey gönderilmez
@@ -56,7 +58,7 @@ object Notifier {
     fun sendNow(ctx: Context, text: String): String? {
         val prefs = Prefs(ctx)
         val time = SimpleDateFormat("HH:mm", Locale("tr")).format(Date())
-        val full = "Güvenli Hat (${prefs.whoName}): $text [$time]"
+        val full = "${BuildConfig.APP_NAME} (${prefs.whoName}): $text [$time]"
         return when (prefs.notifyMethod) {
             NotifyMethod.NONE -> "Bildirim kapalı"
             NotifyMethod.SMS -> sendSms(ctx, prefs, full)

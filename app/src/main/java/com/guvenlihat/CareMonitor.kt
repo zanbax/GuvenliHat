@@ -47,8 +47,9 @@ object CareMonitor {
     fun schedule(ctx: Context) {
         val am = ctx.getSystemService(AlarmManager::class.java) ?: return
         val pi = tickIntent(ctx)
-        if (!isActive(Prefs(ctx))) {
+        if (!isActive(Prefs(ctx)) || Migration.retired(ctx)) {
             am.cancel(pi)
+            am.cancel(exactIntent(ctx))
             return
         }
         // Düzenli kontrol (hareketsizlik, pil, aralıklı konum): esnek alarm, pil dostu
@@ -97,6 +98,10 @@ object CareMonitor {
 
     fun onTick(ctx: Context, done: () -> Unit) {
         schedule(ctx)
+        if (Migration.retired(ctx)) {
+            done()
+            return
+        }
         val prefs = Prefs(ctx)
         val now = System.currentTimeMillis()
         prefs.lastTickAt = now
@@ -155,7 +160,7 @@ object CareMonitor {
     /** Telefon yeniden açıldığında aileye haber ver. */
     fun onBoot(ctx: Context) {
         val prefs = Prefs(ctx)
-        if (prefs.bootAlert) {
+        if (prefs.bootAlert && !Migration.retired(ctx)) {
             val last = prefs.lastTickAt
             val lastText = if (last > 0) {
                 " Kapanmadan önce en son " + SimpleDateFormat("d MMMM HH:mm", Locale("tr")).format(Date(last)) +

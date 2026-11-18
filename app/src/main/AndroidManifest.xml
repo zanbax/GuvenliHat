@@ -27,6 +27,9 @@
     <!-- "WhatsApp'ı aç" düğmesi için (Android 11+ paket görünürlüğü) -->
     <queries>
         <package android:name="com.whatsapp" />
+        <!-- Güvenli Hat -> WeAreNear geçişi: iki uygulama birbirinin kurulu olup olmadığını görebilsin -->
+        <package android:name="com.guvenlihat" />
+        <package android:name="app.wearenear" />
     </queries>
 
     <application
@@ -78,7 +81,7 @@
             android:exported="false"
             android:launchMode="singleTask"
             android:showWhenLocked="true"
-            android:taskAffinity="com.guvenlihat.incall"
+            android:taskAffinity="${applicationId}.incall"
             android:theme="@style/CallTheme"
             android:turnScreenOn="true" />
 

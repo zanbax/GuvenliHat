@@ -49,7 +49,7 @@ object Support {
             .setPositiveButton("Devam") { _, _ ->
                 val body = "SORUN:\n" + input.text.toString().trim().ifEmpty { "(açıklama yazılmadı)" } +
                     "\n\n" + diagnostics(act)
-                share(act, "Güvenli Hat sorun bildirimi", body)
+                share(act, "${BuildConfig.APP_NAME} sorun bildirimi", body)
             }
             .setNegativeButton("Vazgeç", null)
             .show()
@@ -59,7 +59,7 @@ object Support {
         val body = "Lütfen her sorunun altına cevabınızı yazın.\n\n" +
             FEEDBACK_QUESTIONS.joinToString("\n\nCevap: \n\n") + "\n\nCevap: \n\n" +
             "--- Otomatik eklenen bilgiler ---\n" + deviceInfo(act)
-        share(act, "Güvenli Hat geri bildirim", body)
+        share(act, "${BuildConfig.APP_NAME} geri bildirim", body)
     }
 
     private fun share(act: Activity, subject: String, body: String) {
@@ -87,7 +87,7 @@ object Support {
         "Telefon: ${Build.MANUFACTURER} ${Build.MODEL}\n" +
             "Android: ${Build.VERSION.RELEASE} (API ${Build.VERSION.SDK_INT})\n" +
             "Sistem: ${Build.DISPLAY}\n" +
-            "Güvenli Hat: ${appVersion(act)}\n"
+            "${BuildConfig.APP_NAME}: ${appVersion(act)}\n"
 
     private fun yesNo(b: Boolean) = if (b) "Evet" else "HAYIR"
 

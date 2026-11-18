@@ -106,7 +106,7 @@ class SettingsActivity : Activity() {
             root.addView(Ui.button(this, "Giriş", Ui.GREEN) {
                 if (prefs.checkPin(p.text.toString())) {
                     unlocked = true
-                    Notifier.send(this, "Güvenli Hat ayarları açıldı.", throttleKey = "settings_open", throttleMs = 30 * 60_000L)
+                    Notifier.send(this, "${BuildConfig.APP_NAME} ayarları açıldı.", throttleKey = "settings_open", throttleMs = 30 * 60_000L)
                     build()
                 } else {
                     wrongPins++
@@ -193,7 +193,7 @@ class SettingsActivity : Activity() {
             )
             smallButton("Uygulama bilgisini aç", Ui.GRAY) { Setup.openAppDetails(this) }
         }
-        statusRow("Varsayılan telefon uygulaması", Setup.isDefaultDialer(this), "Güvenli Hat'ı varsayılan yap") {
+        statusRow("Varsayılan telefon uygulaması", Setup.isDefaultDialer(this), "Bu uygulamayı varsayılan yap") {
             Setup.requestDefaultDialer(this, RC_DIALER)
         }
         if (!Setup.isDefaultDialer(this)) {
@@ -218,7 +218,7 @@ class SettingsActivity : Activity() {
             }
         }
         statusRow("Pil kısıtlaması kaldırıldı", Setup.isIgnoringBattery(this), "Kısıtlamayı kaldır") {
-            toast("Listede Güvenli Hat'ı bulun ve \"Kısıtlama yok\" / \"Optimize etme\" seçin")
+            toast("Listede ${BuildConfig.APP_NAME} uygulamasını bulun ve \"Kısıtlama yok\" / \"Optimize etme\" seçin")
             Setup.requestIgnoreBattery(this)
         }
         if (Setup.isXiaomi()) {
@@ -228,14 +228,14 @@ class SettingsActivity : Activity() {
                 Setup.openXiaomiPermissions(this)
             }
         }
-        note("Cevapsız arama sayısının Güvenli Hat simgesinde görünmesi için bildirim ayarlarında 'Uygulama simgesi işaretleri' (rozet) açık olmalı.")
+        note("Cevapsız arama sayısının ${BuildConfig.APP_NAME} simgesinde görünmesi için bildirim ayarlarında 'Uygulama simgesi işaretleri' (rozet) açık olmalı.")
         smallButton("Bildirim ayarlarını aç") { Setup.openNotificationSettings(this) }
         note(
             "WhatsApp aramaları: WhatsApp > Ayarlar > Gizlilik > Aramalar > " +
                 "'Bilinmeyen arayanları sessize al' seçeneğini açın.",
         )
         smallButton("WhatsApp'ı aç") { if (!Setup.openWhatsApp(this)) toast("WhatsApp bulunamadı") }
-        note("Ana ekrandaki eski 'Telefon' simgesini kaldırıp yerine Güvenli Hat simgesini koyun.")
+        note("Ana ekrandaki eski 'Telefon' simgesini kaldırıp yerine ${BuildConfig.APP_NAME} simgesini koyun.")
 
         // 2. Korunan kişi
         section("2. Korunan kişi")
@@ -430,7 +430,7 @@ class SettingsActivity : Activity() {
                 Setup.openUsageAccess(this)
             }
             if (!CareMonitor.hasUsageAccess(this)) {
-                note("Açılan listede Güvenli Hat'ı bulup izni açın. Bu izin olmadan sadece aramalar ve Güvenli Hat'ın açılması \"kullanım\" sayılır.")
+                note("Açılan listede ${BuildConfig.APP_NAME} uygulamasını bulup izni açın. Bu izin olmadan sadece aramalar ve ${BuildConfig.APP_NAME} uygulamasının açılması \"kullanım\" sayılır.")
             }
         }
 

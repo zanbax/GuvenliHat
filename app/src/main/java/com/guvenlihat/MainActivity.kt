@@ -100,7 +100,7 @@ class MainActivity : Activity() {
         val row = Ui.row(this)
         val titles = LinearLayout(this)
         titles.orientation = LinearLayout.VERTICAL
-        titles.addView(Ui.label(this, "Güvenli Hat", 30f, Ui.TEXT, bold = true).apply { setPadding(0, 0, 0, 0) })
+        titles.addView(Ui.label(this, BuildConfig.APP_NAME, 30f, Ui.TEXT, bold = true).apply { setPadding(0, 0, 0, 0) })
         val ok = Setup.isDefaultDialer(this) && PhoneUtils.hasContactsPermission(this)
         titles.addView(
             Ui.label(
@@ -128,6 +128,8 @@ class MainActivity : Activity() {
     private fun buildContent() {
         content.removeAllViews()
         val prefs = Prefs(this)
+
+        migrationNotice()
 
         // Yardım düğmesi ve "yanlışlıkla bastım" seçeneği
         if (prefs.helpButtonEnabled) {
@@ -192,6 +194,42 @@ class MainActivity : Activity() {
             }
             content.addView(row)
         }
+    }
+
+    /** Güvenli Hat -> WeAreNear geçiş kartı (eski uygulamada her zaman, yenisinde eskisi duruyorsa). */
+    private fun migrationNotice() {
+        val newInstalled = Migration.isInstalled(this, Migration.NEW_PACKAGE)
+        val text: String
+        val buttons = mutableListOf<View>()
+        if (BuildConfig.LEGACY) {
+            if (!newInstalled) {
+                text = "🎉 Güvenli Hat'ın yeni adı: WeAreNear\n\n" +
+                    "Size gönderilen WeAreNear dosyasını kurun. Kurana kadar bu uygulama sizi korumaya devam eder."
+            } else if (Setup.isDefaultDialer(this)) {
+                text = "✅ WeAreNear kuruldu.\n\nŞimdi WeAreNear uygulamasını açıp kurulumu tamamlayın. " +
+                    "Kurulum bitince bu eski uygulamayı kaldırabilirsiniz."
+                buttons += Ui.button(this, "WeAreNear'ı Aç", Ui.GREEN, 22f) { Migration.launch(this, Migration.NEW_PACKAGE) }
+            } else {
+                text = "✅ Artık WeAreNear sizi koruyor.\n\nBu eski uygulamayı kaldırabilirsiniz."
+                buttons += Ui.button(this, "WeAreNear'ı Aç", Ui.GREEN, 22f) { Migration.launch(this, Migration.NEW_PACKAGE) }
+                buttons += Ui.button(this, "Eski Uygulamayı Kaldır", Ui.GRAY, 20f) {
+                    Migration.openAppDetails(this, Migration.OLD_PACKAGE)
+                }
+            }
+        } else if (Migration.oldAppStillInstalled(this) && Setup.isDefaultDialer(this)) {
+            text = "Eski Güvenli Hat uygulaması hâlâ telefonda. Artık gerek yok, kaldırabilirsiniz."
+            buttons += Ui.button(this, "Eski Uygulamayı Kaldır", Ui.GRAY, 20f) {
+                Migration.openAppDetails(this, Migration.OLD_PACKAGE)
+            }
+        } else {
+            return
+        }
+        val box = Ui.label(this, text, 19f, Ui.GREEN_DARK, bold = true)
+        val p = Ui.dp(this, 14)
+        box.setPadding(p, p, p, p)
+        box.background = Ui.cardBackground(this, Ui.GREEN_TINT, Ui.GREEN, 2)
+        content.addView(box)
+        buttons.forEach { content.addView(it) }
     }
 
     private data class Person(val name: String, val number: String, val safe: Boolean)
@@ -288,7 +326,7 @@ class MainActivity : Activity() {
         if (consentShowing) return
         consentShowing = true
         val text = StringBuilder()
-        text.append("Güvenli Hat sizi telefon dolandırıcılığından korur. Bunun için:\n\n")
+        text.append("${BuildConfig.APP_NAME} sizi telefon dolandırıcılığından korur. Bunun için:\n\n")
         text.append("• Rehberinizi ve arama kayıtlarınızı telefonunuzda okur. Bunlar internete gönderilmez.\n\n")
         text.append("• Rehberde olmayan numaraların aramalarını engeller, tanımadığınız biriyle uzun görüşmeleri keser ve bir yakınınızı arar.\n\n")
         text.append("• Engellenen aramaları, kesilen görüşmeleri, rehber değişikliklerini ve Yardım çağrılarını, arayan numarayla birlikte, seçtiğiniz yakınlarınıza SMS veya Telegram ile bildirir.\n\n")
@@ -300,7 +338,7 @@ class MainActivity : Activity() {
         val p = Ui.dp(this, 20)
         body.setPadding(p, p, p, p)
         val dialog = android.app.AlertDialog.Builder(this)
-            .setTitle("Güvenli Hat ne yapar?")
+            .setTitle("${BuildConfig.APP_NAME} ne yapar?")
             .setView(Ui.scroll(this, body))
             .setCancelable(false)
             .setPositiveButton("Anladım, kabul ediyorum") { _, _ ->
@@ -312,7 +350,7 @@ class MainActivity : Activity() {
                 consentShowing = false
                 Ui.info(
                     this, "Koruma çalışmayacak",
-                    "Kabul etmeden Güvenli Hat sizi koruyamaz. Uygulamayı bir sonraki açışınızda bu ekran tekrar gelecek. " +
+                    "Kabul etmeden ${BuildConfig.APP_NAME} sizi koruyamaz. Uygulamayı bir sonraki açışınızda bu ekran tekrar gelecek. " +
                         "İsterseniz ailenizle konuşup uygulamayı kaldırabilirsiniz.",
                 )
             }
@@ -566,7 +604,7 @@ class MainActivity : Activity() {
             prefs.wasDefaultDialer = true
         } else if (prefs.wasDefaultDialer) {
             Notifier.send(
-                this, "DİKKAT: Güvenli Hat artık varsayılan telefon uygulaması değil, koruma kapalı!",
+                this, "DİKKAT: ${BuildConfig.APP_NAME} artık varsayılan telefon uygulaması değil, koruma kapalı!",
                 throttleKey = "role_lost", throttleMs = 6 * 60 * 60_000L,
             )
         }
