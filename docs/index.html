@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WeAreNear: Yaşlıları telefon dolandırıcılığından koruyan aile uygulaması</title>
+<meta name="description" content="WeAreNear, yaşlı yakınlarınızı telefon dolandırıcılığından korur: tanımadığı numaraları engeller, uzun şüpheli görüşmeleri keser, aileyi haberdar eder.">
+<link rel="icon" href="/favicon.png">
+<style>
+  :root { --green:#2F7D57; --green2:#34A065; --tint:#DCEFE4; --gold:#F2C14E; --text:#2A2A2A; --muted:#5F6368; --bg:#F6F4EF; --card:#fff; --border:#D9D5CC; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:-apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; color:var(--text); background:var(--bg); line-height:1.65; font-size:18px; }
+  a { color:var(--green); }
+  .wrap { max-width:880px; margin:0 auto; padding:0 20px; }
+  header { padding:22px 0; }
+  header .wrap { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+  .brand { display:flex; align-items:center; gap:10px; font-weight:700; font-size:22px; color:var(--text); text-decoration:none; }
+  .brand img { width:40px; height:40px; border-radius:10px; }
+  nav a { margin-left:16px; text-decoration:none; font-size:16px; }
+  .hero { padding:40px 0 30px; display:grid; grid-template-columns:1fr auto; gap:30px; align-items:center; }
+  .hero h1 { font-size:40px; line-height:1.2; margin:0 0 14px; }
+  .hero p { font-size:20px; color:var(--muted); margin:0 0 22px; }
+  .hero img { width:180px; height:180px; border-radius:40px; }
+  .pill { display:inline-block; background:var(--tint); color:#1E5A3E; border-radius:999px; padding:6px 14px; font-size:15px; font-weight:600; margin:0 6px 8px 0; }
+  .story { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:22px 26px; margin:10px 0 34px; }
+  .story p { margin:0; }
+  h2 { font-size:28px; margin:40px 0 16px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:16px; }
+  .card { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:20px; }
+  .card h3 { margin:0 0 6px; font-size:19px; }
+  .card p { margin:0; color:var(--muted); font-size:16px; }
+  .ico { font-size:28px; display:block; margin-bottom:8px; }
+  .en { border-top:1px solid var(--border); margin-top:50px; padding-top:10px; }
+  footer { margin:50px 0 30px; color:var(--muted); font-size:15px; }
+  footer a { margin-right:16px; }
+  @media (max-width:640px) { .hero { grid-template-columns:1fr; } .hero img { width:120px; height:120px; border-radius:28px; order:-1; } .hero h1 { font-size:30px; } nav a { margin-left:10px; } }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <a class="brand" href="/"><img src="/icon.png" alt="">WeAreNear</a>
+    <nav><a href="/privacy/">Gizlilik</a><a href="/support/">Destek</a><a href="#en">English</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <div>
+      <h1>Sevdikleriniz telefonda yalnız değil.</h1>
+      <p>WeAreNear, yaşlı yakınlarınızı telefon dolandırıcılığından korur. Tanımadığı numaraları engeller, uzun şüpheli görüşmeleri keser ve aileyi hemen haberdar eder.</p>
+      <span class="pill">Ücretsiz</span><span class="pill">Reklamsız</span><span class="pill">Sunucu yok, veriler telefonda</span>
+    </div>
+    <img src="/icon.png" alt="WeAreNear simgesi: içinde telefon ahizesi olan beyaz kalp ve ona yaslanan küçük sarı kalp">
+  </section>
+
+  <section class="story">
+    <p>Bu uygulama bir aile hikâyesinden doğdu: Annem, kendini polis olarak tanıtan dolandırıcılar tarafından 40 dakikadan uzun süre telefonda tutuldu. Para gönderilmesini son anda bir banka çalışanı durdurdu. Dolandırıcılar kurbanı uzun süre hatta tutup panik yaratarak çalışıyor. WeAreNear tam olarak buna karşı tasarlandı.</p>
+  </section>
+
+  <h2>Neler yapar?</h2>
+  <div class="grid">
+    <div class="card"><span class="ico">🛡️</span><h3>Tanımadığı aramaları engeller</h3><p>Rehberde olmayan ve gizli numaralar telefonu hiç çaldırmaz. Aile isterse bu filtreyi kapatabilir.</p></div>
+    <div class="card"><span class="ico">⏱️</span><h3>Uzun görüşmeyi keser</h3><p>Tanımadığı biriyle görüşme seçilen süreyi aşınca otomatik kesilir, ardından güvendiği kişi aranır.</p></div>
+    <div class="card"><span class="ico">🔁</span><h3>Geri aramayı engeller</h3><p>"Hat kesilirse beni hemen geri ara" taktiğine karşı, kesilen numara bir süre aranamaz.</p></div>
+    <div class="card"><span class="ico">👨‍👩‍👧</span><h3>Aileyi haberdar eder</h3><p>Engellenen aramalar ve kesilen görüşmeler, ailenin seçtiği yolla (SMS ya da Telegram) bildirilir.</p></div>
+    <div class="card"><span class="ico">❤️</span><h3>Yardım düğmesi</h3><p>Ana ekrandaki düğmeye 3 saniye basılı tutunca yakınlar sırayla aranır ve haber verilir.</p></div>
+    <div class="card"><span class="ico">👵</span><h3>Yaşlı dostu ekran</h3><p>Büyük yazılar, büyük düğmeler, sade renkler. Kırmızı renk yalnızca şüpheli aramalar için kullanılır.</p></div>
+  </div>
+
+  <h2>Nasıl kurulur?</h2>
+  <div class="card">
+    <p>Kurulumu genellikle aileden biri yapar: WeAreNear varsayılan telefon uygulaması seçilir, güvenilir kişiler ve bildirim yolu belirlenir, ayarlar bir PIN ile kilitlenir. Korunan kişi ilk açılışta uygulamanın ne yaptığını anlatan ekranı görür ve onaylar. Kurulumdan sonra telefon her zamanki gibi kullanılır.</p>
+  </div>
+
+  <section class="en" id="en" lang="en">
+    <h2>WeAreNear, in English</h2>
+    <p><strong>Your loved ones are never alone on the phone.</strong> WeAreNear protects older family members from phone scams. It silently blocks calls from numbers that are not in their contacts, ends long calls with unknown numbers after a time limit, prevents scammers from calling straight back, and lets the family know by SMS or Telegram. A help button calls trusted contacts one by one. The app is free, has no ads, and has no servers: everything stays on the phone.</p>
+    <p>The idea came from a real family story: scammers posing as police kept our mother on the line for more than 40 minutes, and a bank employee stopped the transfer at the last moment.</p>
+  </section>
+</main>
+
+<footer class="wrap">
+  <a href="/privacy/">Gizlilik politikası / Privacy policy</a><a href="/support/">Destek / Support</a><br>
+  © 2026 WeAreNear · <a href="mailto:guvenlihatdestek@proton.me">guvenlihatdestek@proton.me</a>
+</footer>
+</body>
+</html>
