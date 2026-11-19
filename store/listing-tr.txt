@@ -1,23 +1,23 @@
 KISA:
 Anne babanızı telefon dolandırıcılığından koruyan sade ve kolay uygulama
 TAM:
-Telefon çalıyor. Arayan kendini polis, savcı ya da banka görevlisi olarak tanıtıyor. Sakin ve ikna edici bir sesle "hesabınız tehlikede" diyor ve telefonu kapatmamanızı istiyor. Bazen bu konuşma saatlerce sürüyor.
+WeAreNear, anne babanızın telefonunu daha güvenli hâle getirir. Rehberlerinde olmayan, tanımadıkları numaralar onlara ulaşamadan engellenir. Şüpheli bir durum olduğunda da siz hemen haberdar olursunuz.
 
-Dolandırıcılar en çok anne babalarımızı, büyüklerimizi hedef alıyor. Onları uzun süre hatta tutuyor, kimseyle konuşmalarına fırsat vermiyorlar. Bu tuzağa düşen pek çok insan yıllarca biriktirdiği parayı kaybediyor. Kayıp çoğu zaman sadece maddi de olmuyor. Yaşadıkları sarsıntı ve duydukları mahcubiyet nedeniyle içine kapanan, dışarı çıkmak istemeyen, toparlanmak için desteğe ihtiyaç duyan insanlar var.
+Bugün telefon dolandırıcılığı, büyüklerimizin karşılaştığı en yaygın tehlikelerden biri. Dolandırıcılar kendilerini polis, savcı ya da banka görevlisi olarak tanıtıyor, telefonu kapatmalarına fırsat vermeyip onları saatlerce hatta tutabiliyor. Bu tuzağa düşenler çoğu zaman yalnızca birikimlerini kaybetmiyor. Yaşadıkları sarsıntı ve mahcubiyet nedeniyle içine kapanan, toparlanmak için desteğe ihtiyaç duyan insanlar var.
 
-WeAreNear, bir ailenin tam da bunu yaşamasının ardından doğdu. Amacı basit: Sevdikleriniz böyle bir anda yalnız kalmasın.
+WeAreNear gerçek bir hikâyeden doğdu: bir annenin tam da bunu yaşamasının ardından. Amacı basit: Sevdiklerimizi kötü niyetli insanlardan korumak.
 
 NASIL KORUR?
-• Rehberde olmayan ve gizli numaralardan gelen aramalar çalmadan engellenir, size haber verilir.
+• Rehberde olmayan ve gizli numaralardan gelen aramalar engellenir, güvendiği kişilere (eşi, çocukları gibi) bildirim gider.
 • "Numaramı kaydedin" tuzağına karşı: Rehbere yeni eklenen bir numara aradığında ekranda açık bir uyarı görünür.
-• Tanımadığı biriyle konuşma süresi sınırlanır. Süre dolunca görüşme nazikçe sonlandırılır ve aynı numara bir süre tekrar arayamaz.
-• Şüpheli bir durumda SMS veya Telegram ile size hemen haber gider, siz de hemen arayabilirsiniz.
-• Yardım düğmesi: 3 saniye basılı tutunca güvendiği yakınları sırayla aranır.
+• Rehberde olmayan ya da rehbere yeni eklenen numaralarla görüşme süresi sınırlanır. Süre dolunca görüşme nazikçe sonlandırılır, güvendiği kişilere bildirim gider ve aynı numarayla bir süre tekrar görüşülemez.
+• Şüpheli bir durumda güvendiği kişilere SMS veya Telegram ile hemen haber gider.
+• Yardım düğmesi: 3 saniye basılı tutunca güvendiği kişiler sırayla aranır.
 • "Arama Bekliyorum": Hastane, kargo gibi beklenen bir arama için koruma geçici olarak esnetilebilir.
 
 KOLAY OKUNUR, KOLAY KULLANILIR
-• Net yazılar, belirgin düğmeler, sade ekranlar
-• Sevdikleri ana ekranda, tek dokunuşla aranabilir
+• Net yazılar, belirgin düğmeler, sade ekran
+• Yakınlar ana ekranda, tek dokunuşla aranabilir
 • Rehber, son aramalar ve tuş takımı her zaman el altında
 
 AİLECE KURULUR
@@ -27,7 +27,7 @@ AİLECE KURULUR
 GİZLİLİĞE SAYGILI
 • Reklam yok, hesap yok, sunucu yok.
 • Tüm ayarlar ve kayıtlar yalnızca telefonda saklanır.
-• Bildirimler yalnızca sizin belirlediğiniz aile üyelerine gider.
+• Bildirimler yalnızca sizin belirlediğiniz güvenilir kişilere gider.
 
 Not: WeAreNear'ın koruma sağlayabilmesi için varsayılan telefon uygulaması olarak ayarlanması gerekir. Bu nedenle arama kaydı ve kişiler izinlerini kullanır.
 
