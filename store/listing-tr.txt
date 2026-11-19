@@ -1,0 +1,34 @@
+KISA:
+Anne babanızı telefon dolandırıcılığından koruyan sade ve kolay uygulama
+TAM:
+Telefon çalıyor. Arayan kendini polis, savcı ya da banka görevlisi olarak tanıtıyor. Sakin ve ikna edici bir sesle "hesabınız tehlikede" diyor ve telefonu kapatmamanızı istiyor. Bazen bu konuşma saatlerce sürüyor.
+
+Dolandırıcılar en çok anne babalarımızı, büyüklerimizi hedef alıyor. Onları uzun süre hatta tutuyor, kimseyle konuşmalarına fırsat vermiyorlar. Bu tuzağa düşen pek çok insan yıllarca biriktirdiği parayı kaybediyor. Kayıp çoğu zaman sadece maddi de olmuyor. Yaşadıkları sarsıntı ve duydukları mahcubiyet nedeniyle içine kapanan, dışarı çıkmak istemeyen, toparlanmak için desteğe ihtiyaç duyan insanlar var.
+
+WeAreNear, bir ailenin tam da bunu yaşamasının ardından doğdu. Amacı basit: Sevdikleriniz böyle bir anda yalnız kalmasın.
+
+NASIL KORUR?
+• Rehberde olmayan ve gizli numaralardan gelen aramalar çalmadan engellenir, size haber verilir.
+• "Numaramı kaydedin" tuzağına karşı: Rehbere yeni eklenen bir numara aradığında ekranda açık bir uyarı görünür.
+• Tanımadığı biriyle konuşma süresi sınırlanır. Süre dolunca görüşme nazikçe sonlandırılır ve aynı numara bir süre tekrar arayamaz.
+• Şüpheli bir durumda SMS veya Telegram ile size hemen haber gider, siz de hemen arayabilirsiniz.
+• Yardım düğmesi: 3 saniye basılı tutunca güvendiği yakınları sırayla aranır.
+• "Arama Bekliyorum": Hastane, kargo gibi beklenen bir arama için koruma geçici olarak esnetilebilir.
+
+KOLAY OKUNUR, KOLAY KULLANILIR
+• Net yazılar, belirgin düğmeler, sade ekranlar
+• Sevdikleri ana ekranda, tek dokunuşla aranabilir
+• Rehber, son aramalar ve tuş takımı her zaman el altında
+
+AİLECE KURULUR
+• Kurulumu ve ayarları siz yaparsınız, anne babanızın onayı alınır.
+• Ayarlar aile PIN'i ile korunur.
+
+GİZLİLİĞE SAYGILI
+• Reklam yok, hesap yok, sunucu yok.
+• Tüm ayarlar ve kayıtlar yalnızca telefonda saklanır.
+• Bildirimler yalnızca sizin belirlediğiniz aile üyelerine gider.
+
+Not: WeAreNear'ın koruma sağlayabilmesi için varsayılan telefon uygulaması olarak ayarlanması gerekir. Bu nedenle arama kaydı ve kişiler izinlerini kullanır.
+
+Gizlilik politikası: https://wearenear.app/privacy/
