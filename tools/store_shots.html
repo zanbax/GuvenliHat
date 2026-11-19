@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="tr"><head><meta charset="utf-8">
+<style>
+:root{
+  --green:#2F7D57; --red:#B23B3B; --blue:#3B6EA5; --gray:#6B7378; --key:#5C6670;
+  --yellow:#FBE8B0; --dark:#1B2733; --light:#C5CED6; --warn:#FFD27A; --text:#2A2A2A;
+  --sec:#5F6368; --bg:#F6F4EF; --border:#D9D5CC; --redtint:#FBEDEC; --reddark:#8A2626;
+  --greentint:#DCEFE4; --greendark:#1E5A3E; --bluetint:#E3ECF6; --bluedark:#24476F;
+  --purple:#5E4BA8; --purpletint:#ECE8F8; --amber:#9A5B00; --ambertint:#FCEFD8; --orange:#A85400;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#888;font-family:Inter,"Noto Color Emoji",sans-serif}
+.shot{width:360px;height:640px;position:relative;overflow:hidden;
+  background:linear-gradient(170deg,#34A065 0%,#2F7D57 45%,#24694A 100%);margin:0 0 10px 0}
+.cap{position:absolute;left:0;right:0;top:34px;padding:0 26px;text-align:center;color:#fff}
+.cap h1{font-size:27px;line-height:1.16;font-weight:800;letter-spacing:-.4px}
+.cap p{font-size:14.5px;line-height:1.38;margin-top:9px;color:#E6F4EC;font-weight:500}
+.phone{position:absolute;left:38px;top:186px;width:284px;height:520px;border-radius:34px;
+  background:#101418;padding:9px;box-shadow:0 18px 40px rgba(0,0,0,.35)}
+.screen{width:266px;height:510px;border-radius:26px;overflow:hidden;position:relative}
+.ui{width:360px;transform:scale(.7389);transform-origin:0 0;position:absolute;left:0;top:0;height:602px}
+.status{height:30px;display:flex;justify-content:space-between;align-items:center;padding:0 20px;
+  font-size:14px;font-weight:600}
+.status .ic{display:flex;gap:6px;align-items:center}
+.status .bat{width:22px;height:11px;border:1.6px solid currentColor;border-radius:3px;position:relative}
+.status .bat:after{content:"";position:absolute;left:1.5px;top:1.5px;bottom:1.5px;width:13px;background:currentColor;border-radius:1px}
+/* ---- ana ekran ---- */
+.main{background:var(--bg);color:var(--text)}
+.hdr{display:flex;justify-content:space-between;align-items:flex-start;padding:14px 16px 8px}
+.hdr h2{font-size:30px;font-weight:700;line-height:1.15}
+.ok{color:var(--green);font-size:19px;font-weight:700;margin-top:4px}
+.fam{border:1px solid var(--border);border-radius:14px;padding:6px 10px;color:var(--sec);font-size:17px;margin-top:6px}
+.c{padding:0 16px}
+.help{height:96px;border-radius:16px;background:var(--red);display:flex;align-items:center;padding:0 16px;color:#fff;margin:6px 0}
+.help .circ{width:62px;height:62px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;margin-right:16px}
+.help b{font-size:30px;display:block}
+.help span{font-size:17px}
+.btn{border-radius:16px;min-height:72px;display:flex;align-items:center;justify-content:center;color:#fff;
+  font-size:22px;font-weight:600;margin:6px 0;text-align:center;padding:12px 16px;line-height:1.2}
+.sect{font-size:20px;color:var(--sec);font-weight:700;padding:10px 0 4px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:14px 10px 12px;text-align:center}
+.card.safe{border:2px solid var(--green)}
+.av{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  margin:0 auto 6px;font-size:27px;font-weight:700}
+.card .n{font-size:21px;font-weight:700;line-height:1.2}
+.card .t{font-size:16px;color:var(--green);margin-top:3px}
+.bar{position:absolute;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--border);
+  display:flex;gap:8px;padding:10px 12px 16px}
+.tile{flex:1;height:104px;border:1px solid var(--border);border-radius:14px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;font-size:18px;font-weight:700}
+.tile .ci{width:54px;height:54px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:4px}
+.redbox{background:var(--redtint);border:2px solid var(--red);border-radius:14px;padding:14px;color:var(--reddark);
+  font-size:20px;font-weight:700;line-height:1.35;margin:6px 0}
+/* ---- arama ekranı ---- */
+.call{background:var(--dark);color:#fff;display:flex;flex-direction:column;padding:0 20px}
+.call .status{padding:0;color:#fff}
+.banner{background:var(--yellow);border-radius:14px;color:#000;font-size:26px;font-weight:700;padding:16px;
+  text-align:center;line-height:1.3;margin-top:14px}
+.bigav{width:104px;height:104px;border-radius:50%;margin:24px auto 10px;display:flex;align-items:center;justify-content:center;
+  font-size:44px;font-weight:700}
+.nm{font-size:34px;font-weight:700;text-align:center;line-height:1.2}
+.sub{font-size:22px;text-align:center;color:var(--light);margin-top:6px}
+.sp{flex:1}
+.row{display:flex;gap:8px;margin-bottom:34px}
+.row .btn{flex:1;font-size:32px;font-weight:600}
+/* ---- mesajlar ---- */
+.msg{background:#EEF1F4;color:#1d1d1d}
+.mh{background:#fff;display:flex;align-items:center;padding:10px 16px 12px;border-bottom:1px solid #dde2e6}
+.mh .av{width:42px;height:42px;font-size:19px;margin:0 12px 0 0}
+.mh b{font-size:19px}
+.mh small{display:block;font-size:13px;color:#6a737b}
+.bub{background:#fff;border-radius:18px 18px 18px 6px;padding:12px 14px;margin:12px 56px 0 14px;font-size:16px;line-height:1.38;
+  box-shadow:0 1px 1px rgba(0,0,0,.06)}
+.bub .tm{display:block;text-align:right;font-size:12px;color:#8a939a;margin-top:4px}
+.day{text-align:center;font-size:13px;color:#6a737b;margin-top:14px}
+/* ---- tanıtım görseli ---- */
+.fg{width:1024px;height:500px;position:relative;overflow:hidden;
+  background:linear-gradient(120deg,#34A065 0%,#2F7D57 55%,#24694A 100%);display:flex;align-items:center;padding:0 70px}
+.fg img{width:250px;height:250px;border-radius:56px;box-shadow:0 20px 50px rgba(0,0,0,.28)}
+.fg .tx{margin-left:60px;color:#fff}
+.fg h1{font-size:76px;font-weight:800;letter-spacing:-1.5px;line-height:1}
+.fg p{font-size:33px;font-weight:600;margin-top:20px;line-height:1.25;color:#F1FAF4}
+.fg .tags{display:flex;gap:12px;margin-top:28px}
+.fg .tags span{background:rgba(255,255,255,.16);border:1.5px solid rgba(255,255,255,.35);border-radius:30px;padding:9px 18px;font-size:21px;font-weight:600}
+</style></head><body>
+
+<!-- ===== 1: Ana ekran ===== -->
+<div class="shot" id="s1">
+  <div class="cap"><h1>Büyük, sade ve kolay</h1>
+    <p>Yakınlarınızı tek dokunuşla arayın.<br>Yaşlılar için tasarlanmış telefon ekranı.</p></div>
+  <div class="phone"><div class="screen"><div class="ui main">
+    <div class="status"><span>10:41</span><span class="ic">▾ ▴ <i class="bat"></i></span></div>
+    <div class="hdr"><div><h2>WeAreNear</h2><div class="ok">✓ Koruma Açık</div></div><div class="fam">⚙ Aile</div></div>
+    <div class="c">
+      <div class="help"><div class="circ"><svg width="34" height="34" viewBox="0 0 24 24"><path fill="#B23B3B" d="M12 21s-7.5-4.6-10-9.3C.3 8.3 2.3 4.5 6 4.5c2.2 0 3.6 1.2 4.4 2.4h3.2C14.4 5.7 15.8 4.5 18 4.5c3.7 0 5.7 3.8 4 7.2C19.5 16.4 12 21 12 21z"/></svg></div>
+        <div><b>Yardım</b><span>3 saniye basılı tutun</span></div></div>
+      <div class="btn" style="background:var(--key)">⏳&nbsp; Arama Bekliyorum</div>
+      <div class="sect">Yakınlarım</div>
+      <div class="grid">
+        <div class="card safe"><div class="av" style="background:var(--greentint);color:var(--greendark)">A</div><div class="n">Ayşe (Kızım)</div><div class="t">🛡 Güvenli</div></div>
+        <div class="card safe"><div class="av" style="background:var(--greentint);color:var(--greendark)">M</div><div class="n">Mehmet (Oğlum)</div><div class="t">🛡 Güvenli</div></div>
+        <div class="card"><div class="av" style="background:var(--bluetint);color:var(--bluedark)">Z</div><div class="n">Zeynep Torunum</div></div>
+        <div class="card"><div class="av" style="background:var(--bluetint);color:var(--bluedark)">F</div><div class="n">Komşu Fatma</div></div>
+      </div>
+    </div>
+<div class="bar">
+      <div class="tile"><div class="ci" style="background:var(--bluetint)"><svg width="32" height="32" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" fill="#3B6EA5"/><path d="M4 20c0-4 3.6-6 8-6s8 2 8 6z" fill="#3B6EA5"/></svg></div>Rehber</div>
+      <div class="tile"><div class="ci" style="background:var(--purpletint)"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#5E4BA8" stroke-width="2.4" stroke-linecap="round"><path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3"/><path d="M4 4v4h4"/><path d="M12 8v4.5l3 2"/></svg></div>Aramalar</div>
+      <div class="tile"><div class="ci" style="background:var(--ambertint)"><svg width="30" height="30" viewBox="0 0 24 24" fill="#9A5B00"><circle cx="5" cy="4" r="2"/><circle cx="12" cy="4" r="2"/><circle cx="19" cy="4" r="2"/><circle cx="5" cy="10.5" r="2"/><circle cx="12" cy="10.5" r="2"/><circle cx="19" cy="10.5" r="2"/><circle cx="5" cy="17" r="2"/><circle cx="12" cy="17" r="2"/><circle cx="19" cy="17" r="2"/><circle cx="12" cy="22" r="1.8"/></svg></div>Tuşla</div>
+    </div>
+  </div></div></div>
+</div>
+
+<!-- ===== 2: Rehbere yeni eklenen numara ===== -->
+<div class="shot" id="s2">
+  <div class="cap"><h1>"Numaramı kaydedin" tuzağına karşı</h1>
+    <p>Rehbere yeni eklenen bir numara aradığında<br>ekranda açık bir uyarı görünür.</p></div>
+  <div class="phone"><div class="screen"><div class="ui call">
+    <div class="status"><span>14:05</span><span class="ic">▾ ▴ <i class="bat"></i></span></div>
+    <div class="bigav" style="background:var(--bluetint);color:var(--bluedark)">P</div>
+    <div class="nm">Polis Merkezi</div>
+    <div class="sub" style="color:var(--warn)">⚠ Rehbere Yeni Eklendi</div>
+    <div class="sub">Sizi Arıyor</div>
+    <div class="sp"></div>
+    <div class="row"><div class="btn" style="background:var(--green)">Aç</div><div class="btn" style="background:var(--red)">Reddet</div></div>
+  </div></div></div>
+</div>
+
+<!-- ===== 3: Görüşme kesildi ===== -->
+<div class="shot" id="s3">
+  <div class="cap"><h1>Uzun şüpheli görüşmeler kesilir</h1>
+    <p>Tanımadığı biriyle konuşma süresi sınırlanır.<br>Süre dolunca görüşme otomatik biter.</p></div>
+  <div class="phone"><div class="screen"><div class="ui call">
+    <div class="status"><span>14:15</span><span class="ic">▾ ▴ <i class="bat"></i></span></div>
+    <div class="banner">Bu konuşma güvenliğiniz için sonlandırıldı.</div>
+    <div class="sp"></div>
+    <div class="btn" style="background:var(--blue);font-size:28px;margin-bottom:34px">Tamam</div>
+  </div></div></div>
+</div>
+
+<!-- ===== 4: Aileye bildirim ===== -->
+<div class="shot" id="s4">
+  <div class="cap"><h1>Aileniz anında haberdar olur</h1>
+    <p>Şüpheli bir durumda SMS veya Telegram ile<br>size hemen haber verir.</p></div>
+  <div class="phone"><div class="screen"><div class="ui msg">
+    <div class="status" style="background:#fff"><span>14:15</span><span class="ic">▾ ▴ <i class="bat"></i></span></div>
+    <div class="mh"><div class="av" style="background:var(--greentint);color:var(--greendark)">A</div><div><b>Annem</b><small>Mesajlar</small></div></div>
+    <div class="day">Bugün</div>
+    <div class="bub">WeAreNear (Annem): Rehberde olmayan 0850 000 12 34 numarası aradı, arama engellendi. [10:12]<span class="tm">10:12</span></div>
+    <div class="bub">WeAreNear (Annem): Polis Merkezi (0850 000 56 78, rehbere yeni eklendi) ile 10 dakika konuştu, görüşme otomatik KESİLDİ. Dolandırıcılık olabilir, lütfen hemen arayın! [14:15]<span class="tm">14:15</span></div>
+    <div class="bub">WeAreNear (Annem): Az önce görüşmesi kesilen 0850 000 56 78 numarası tekrar aradı, engellendi. [14:16]<span class="tm">14:16</span></div>
+  </div></div></div>
+</div>
+
+<!-- ===== 5: Yardım ===== -->
+<div class="shot" id="s5">
+  <div class="cap"><h1>Tek tuşla yardım</h1>
+    <p>Yardım düğmesine basılı tutunca<br>yakınlarınız sırayla aranır ve haber alır.</p></div>
+  <div class="phone"><div class="screen"><div class="ui main">
+    <div class="status"><span>16:20</span><span class="ic">▾ ▴ <i class="bat"></i></span></div>
+    <div class="hdr"><div><h2>WeAreNear</h2><div class="ok">✓ Koruma Açık</div></div><div class="fam">⚙ Aile</div></div>
+    <div class="c">
+      <div class="redbox">🆘 Yardım çağrısı gönderildi.<br>Yakınlarınıza haber verildi.</div>
+      <div class="btn" style="background:var(--gray);font-size:20px">Yanlışlıkla bastım, sorun yok</div>
+      <div class="btn" style="background:var(--key)">⏳&nbsp; Arama Bekliyorum</div>
+      <div class="sect">Yakınlarım</div>
+      <div class="grid">
+        <div class="card safe"><div class="av" style="background:var(--greentint);color:var(--greendark)">A</div><div class="n">Ayşe (Kızım)</div><div class="t">🛡 Güvenli</div></div>
+        <div class="card safe"><div class="av" style="background:var(--greentint);color:var(--greendark)">M</div><div class="n">Mehmet (Oğlum)</div><div class="t">🛡 Güvenli</div></div>
+      </div>
+    </div>
+<div class="bar">
+      <div class="tile"><div class="ci" style="background:var(--bluetint)"><svg width="32" height="32" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" fill="#3B6EA5"/><path d="M4 20c0-4 3.6-6 8-6s8 2 8 6z" fill="#3B6EA5"/></svg></div>Rehber</div>
+      <div class="tile"><div class="ci" style="background:var(--purpletint)"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#5E4BA8" stroke-width="2.4" stroke-linecap="round"><path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3"/><path d="M4 4v4h4"/><path d="M12 8v4.5l3 2"/></svg></div>Aramalar</div>
+      <div class="tile"><div class="ci" style="background:var(--ambertint)"><svg width="30" height="30" viewBox="0 0 24 24" fill="#9A5B00"><circle cx="5" cy="4" r="2"/><circle cx="12" cy="4" r="2"/><circle cx="19" cy="4" r="2"/><circle cx="5" cy="10.5" r="2"/><circle cx="12" cy="10.5" r="2"/><circle cx="19" cy="10.5" r="2"/><circle cx="5" cy="17" r="2"/><circle cx="12" cy="17" r="2"/><circle cx="19" cy="17" r="2"/><circle cx="12" cy="22" r="1.8"/></svg></div>Tuşla</div>
+    </div>
+  </div></div></div>
+</div>
+
+<!-- ===== Tanıtım görseli 1024x500 ===== -->
+<div class="fg" id="fg">
+  <img src="../store/play-icon-512.png">
+  <div class="tx"><h1>WeAreNear</h1>
+    <p>Sevdiklerinizi telefon<br>dolandırıcılarından koruyun</p>
+    <div class="tags"><span>Reklamsız</span><span>Hesap gerekmez</span><span>Veriler telefonda kalır</span></div></div>
+</div>
+</body></html>
