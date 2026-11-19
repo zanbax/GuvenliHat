@@ -514,7 +514,7 @@ class MainActivity : Activity() {
             },
         )
         bottomBar.addView(
-            navTile(R.drawable.ic_nav_dialpad, "Tuşla", Ui.AMBER_TINT, Ui.AMBER, 0) {
+            navTile(R.drawable.ic_nav_dialpad, "Tuşlar", Ui.AMBER_TINT, Ui.AMBER, 0) {
                 startActivity(Intent(this, DialpadActivity::class.java))
             },
         )
