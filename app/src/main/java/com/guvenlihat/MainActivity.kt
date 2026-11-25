@@ -354,7 +354,7 @@ class MainActivity : Activity() {
                         "İsterseniz ailenizle konuşup uygulamayı kaldırabilirsiniz.",
                 )
             }
-            .show()
+            .showLight()
         dialog.getButton(android.app.AlertDialog.BUTTON_POSITIVE)?.textSize = 18f
         dialog.getButton(android.app.AlertDialog.BUTTON_NEGATIVE)?.textSize = 18f
     }

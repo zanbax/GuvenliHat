@@ -1,9 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <style name="AppTheme" parent="@android:style/Theme.Material.Light.NoActionBar">
         <item name="android:windowBackground">#F6F4EF</item>
+        <item name="android:colorBackground">#F6F4EF</item>
         <item name="android:statusBarColor">#2F7D57</item>
         <item name="android:colorAccent">#2F7D57</item>
+        <!-- Yazı renkleri sabit: telefonun gece modu açık zemin + koyu yazı düzenini bozmasın. -->
+        <item name="android:textColorPrimary">#2A2A2A</item>
+        <item name="android:textColorSecondary">#5F6368</item>
+        <item name="android:textColorHint">#80868B</item>
+        <!-- Android 10+: sistemin uygulamayı zorla karartmasını kapat (yaşlılar için okunabilirlik). -->
+        <item name="android:forceDarkAllowed" tools:targetApi="29">false</item>
     </style>
 
     <style name="CallTheme" parent="@android:style/Theme.Material.NoActionBar">
@@ -11,5 +18,6 @@
         <item name="android:statusBarColor">#1B2733</item>
         <item name="android:navigationBarColor">#1B2733</item>
         <item name="android:colorAccent">#FFD54F</item>
+        <item name="android:forceDarkAllowed" tools:targetApi="29">false</item>
     </style>
 </resources>

@@ -52,7 +52,7 @@ object Support {
                 share(act, "${BuildConfig.APP_NAME} sorun bildirimi", body)
             }
             .setNegativeButton("Vazgeç", null)
-            .show()
+            .showLight()
     }
 
     fun sendFeedback(act: Activity) {

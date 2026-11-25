@@ -8,6 +8,7 @@ import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
+import android.graphics.drawable.InsetDrawable
 import android.graphics.drawable.RippleDrawable
 import android.graphics.Outline
 import android.net.Uri
@@ -59,6 +60,10 @@ object Ui {
      * light = açık zeminli ekran (durum çubuğu simgeleri koyu olsun).
      */
     fun edgeToEdge(act: Activity, root: View, light: Boolean = true) {
+        // Zemini pencereye bırakmayıp kendimiz boyuyoruz: bazı Samsung telefonların (Android 9)
+        // gece modu pencere zeminini siyaha çeviriyor ama koyu yazıları olduğu gibi bırakıyor,
+        // o zaman yazılar okunmuyor.
+        if (light) root.setBackgroundColor(BG)
         if (Build.VERSION.SDK_INT < 35) return
         val l = root.paddingLeft
         val t = root.paddingTop
@@ -242,6 +247,20 @@ object Ui {
         return row
     }
 
+    /**
+     * Pencere zeminini açık renge sabitler (gece modu olan Samsung'larda siyah zemin + koyu yazı olmasın).
+     * Varsayılan Material pencerenin kenar boşluklarını korur.
+     */
+    fun lightDialog(d: AlertDialog): AlertDialog {
+        val ctx = d.context
+        val shape = GradientDrawable().apply {
+            setColor(CARD)
+            cornerRadius = dp(ctx, 16).toFloat()
+        }
+        d.window?.setBackgroundDrawable(InsetDrawable(shape, dp(ctx, 16), dp(ctx, 24), dp(ctx, 16), dp(ctx, 24)))
+        return d
+    }
+
     fun scroll(ctx: Context, child: View): ScrollView {
         val s = ScrollView(ctx)
         s.isFillViewport = true
@@ -261,7 +280,7 @@ object Ui {
             .setView(body)
             .setPositiveButton(yes) { _, _ -> onYes() }
             .setNegativeButton(no, null)
-            .show()
+            .showLight()
         dialog.getButton(AlertDialog.BUTTON_POSITIVE)?.textSize = 22f
         dialog.getButton(AlertDialog.BUTTON_NEGATIVE)?.textSize = 22f
     }
@@ -279,16 +298,20 @@ object Ui {
         }
         box.addView(button(act, "Vazgeç", GRAY, 20f) { dialog.dismiss() })
         dialog.show()
+        lightDialog(dialog)
     }
 
     fun info(act: Activity, title: String, message: String) {
         val body = label(act, message, 22f)
         val p = dp(act, 20)
         body.setPadding(p, p, p, p)
-        val dialog = AlertDialog.Builder(act).setTitle(title).setView(body).setPositiveButton("Tamam", null).show()
+        val dialog = AlertDialog.Builder(act).setTitle(title).setView(body).setPositiveButton("Tamam", null).showLight()
         dialog.getButton(AlertDialog.BUTTON_POSITIVE)?.textSize = 22f
     }
 }
+
+/** show() gibi, ama pencere zemini her telefonda açık renk kalır (bkz. Ui.lightDialog). */
+fun AlertDialog.Builder.showLight(): AlertDialog = Ui.lightDialog(show())
 
 /** Yaşlı kişinin başlattığı her arama buradan geçer: engel ve "rehberde yok" uyarısı. */
 object CallFlow {

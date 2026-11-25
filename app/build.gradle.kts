@@ -13,8 +13,8 @@ android {
         minSdk = 24
         // Google Play: yeni uygulamalar ve güncellemeler Android 16'yı (API 36) hedeflemeli
         targetSdk = 36
-        versionCode = 18
-        versionName = "0.10.0"
+        versionCode = 19
+        versionName = "0.10.1"
     }
 
     // Sabit imza anahtarı: her yeni APK eskisinin üzerine güncelleme olarak kurulabilsin.

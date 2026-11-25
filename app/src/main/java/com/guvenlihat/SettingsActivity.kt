@@ -547,7 +547,7 @@ class SettingsActivity : Activity() {
                 build()
             }
             .setNegativeButton("Vazgeç", null)
-            .show()
+            .showLight()
     }
 
     private fun requestBackgroundLocation() {
@@ -587,7 +587,7 @@ class SettingsActivity : Activity() {
                 }
             }
             .setNegativeButton("Vazgeç", null)
-            .show()
+            .showLight()
     }
 
     private fun changePin() {
@@ -605,7 +605,7 @@ class SettingsActivity : Activity() {
                 }
             }
             .setNegativeButton("Vazgeç", null)
-            .show()
+            .showLight()
     }
 
     private fun findTelegramChats() {
@@ -634,7 +634,7 @@ class SettingsActivity : Activity() {
                                 prefs.telegramChatTitle = chats[i].second
                                 build()
                             }
-                            .show()
+                            .showLight()
                     }
                 }
                 result.onFailure { Ui.info(this, "Hata", it.message ?: "Bağlantı hatası") }
