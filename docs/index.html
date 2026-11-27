@@ -4,85 +4,319 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>WeAreNear: Yaşlıları telefon dolandırıcılığından koruyan aile uygulaması</title>
-<meta name="description" content="WeAreNear, yaşlı yakınlarınızı telefon dolandırıcılığından korur: tanımadığı numaraları engeller, uzun şüpheli görüşmeleri keser, aileyi haberdar eder.">
+<meta name="description" content="WeAreNear, yaşlı yakınlarınızı telefon dolandırıcılığından korur: rehberde olmayan numaraların aramasını engeller, uzun süren şüpheli görüşmeleri sonlandırır, aileye anında haber verir.">
+<meta name="theme-color" content="#14201B">
 <link rel="icon" href="/favicon.png">
+<link rel="canonical" href="https://wearenear.app/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://wearenear.app/">
+<meta property="og:title" content="WeAreNear: Sevdikleriniz telefonda yalnız değil.">
+<meta property="og:description" content="Telefon dolandırıcılığına karşı aile koruma uygulaması. Rehberde olmayan numaraların aramasını engeller, uzun şüpheli görüşmeleri sonlandırır, aileye haber verir.">
+<meta property="og:image" content="https://wearenear.app/media/paylasim.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="tr_TR">
+<meta name="twitter:card" content="summary_large_image">
 <style>
-  :root { --green:#2F7D57; --green2:#34A065; --tint:#DCEFE4; --gold:#F2C14E; --text:#2A2A2A; --muted:#5F6368; --bg:#F6F4EF; --card:#fff; --border:#D9D5CC; }
+  :root { --green:#2F7D57; --green2:#34A065; --tint:#DCEFE4; --gold:#F2C14E; --text:#2A2A2A; --muted:#5F6368; --bg:#F6F4EF; --card:#fff; --border:#D9D5CC; --night:#14201B; --red:#C0392B; }
   * { box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
   body { margin:0; font-family:-apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; color:var(--text); background:var(--bg); line-height:1.65; font-size:18px; }
   a { color:var(--green); }
-  .wrap { max-width:880px; margin:0 auto; padding:0 20px; }
-  header { padding:22px 0; }
-  header .wrap { display:flex; align-items:center; justify-content:space-between; gap:12px; }
-  .brand { display:flex; align-items:center; gap:10px; font-weight:700; font-size:22px; color:var(--text); text-decoration:none; }
-  .brand img { width:40px; height:40px; border-radius:10px; }
-  nav a { margin-left:16px; text-decoration:none; font-size:16px; white-space:nowrap; }
-  .hero { padding:40px 0 30px; display:grid; grid-template-columns:1fr auto; gap:30px; align-items:center; }
-  .hero h1 { font-size:40px; line-height:1.2; margin:0 0 14px; }
-  .hero p { font-size:20px; color:var(--muted); margin:0 0 22px; }
-  .hero img { width:180px; height:180px; border-radius:40px; }
-  .pill { display:inline-block; background:var(--tint); color:#1E5A3E; border-radius:999px; padding:6px 14px; font-size:15px; font-weight:600; margin:0 6px 8px 0; }
-  .story { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:22px 26px; margin:10px 0 34px; }
+  img, video { max-width:100%; display:block; }
+  .wrap { max-width:1080px; margin:0 auto; padding:0 20px; }
+  section { padding:64px 0; }
+  h2 { font-size:34px; line-height:1.2; margin:0 0 14px; }
+  .lead { font-size:20px; color:var(--muted); margin:0 0 28px; max-width:720px; }
+  .eyebrow { display:inline-block; font-size:14px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--green); margin-bottom:10px; }
+
+  /* Üst menü */
+  header { position:sticky; top:0; z-index:10; background:rgba(20,32,27,.92); backdrop-filter:blur(8px); }
+  header .wrap { display:flex; align-items:center; justify-content:space-between; gap:12px; padding-top:12px; padding-bottom:12px; }
+  .brand { display:flex; align-items:center; gap:10px; font-weight:700; font-size:21px; color:#fff; text-decoration:none; }
+  .brand img { width:36px; height:36px; border-radius:9px; }
+  nav a { margin-left:18px; color:#D9E8DF; text-decoration:none; font-size:16px; white-space:nowrap; }
+  nav a:hover { color:#fff; }
+
+  /* Giriş */
+  .hero { background:radial-gradient(1200px 600px at 80% 0%, #24382F 0%, var(--night) 60%); color:#fff; padding:56px 0 72px; }
+  .hero .wrap { display:grid; grid-template-columns:1.15fr .85fr; gap:48px; align-items:center; }
+  .hero .eyebrow { color:#8FD3AC; }
+  .hero h1 { font-size:50px; line-height:1.1; margin:0 0 18px; }
+  .hero p { font-size:21px; color:#D2DED7; margin:0 0 28px; }
+  .btns { display:flex; flex-wrap:wrap; gap:12px; margin-bottom:22px; }
+  .btn { display:inline-flex; align-items:center; gap:10px; padding:15px 24px; border-radius:14px; font-size:18px; font-weight:700; text-decoration:none; }
+  .btn.primary { background:var(--gold); color:#2A2205; }
+  .btn.primary:hover { background:#F7CD63; }
+  .btn.ghost { border:2px solid rgba(255,255,255,.35); color:#fff; }
+  .btn.soon { background:rgba(255,255,255,.08); color:#D2DED7; border:2px dashed rgba(255,255,255,.25); cursor:default; }
+  .pills span { display:inline-block; background:rgba(143,211,172,.14); color:#BDE8CF; border-radius:999px; padding:6px 14px; font-size:15px; font-weight:600; margin:0 6px 8px 0; }
+  .phone { justify-self:center; width:min(320px, 100%); aspect-ratio:9/16; border-radius:38px; padding:10px; background:#0B110E; box-shadow:0 30px 80px rgba(0,0,0,.55), 0 0 0 2px #2B3A33 inset; }
+  .phone video { width:100%; height:100%; object-fit:cover; border-radius:30px; }
+
+  /* Video */
+  .film .wrap { display:grid; grid-template-columns:.9fr 1.1fr; gap:48px; align-items:center; }
+  .player { width:min(380px, 100%); justify-self:center; border-radius:22px; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,.25); background:#000; }
+  .player video { width:100%; aspect-ratio:9/16; }
+  .story { background:var(--card); border:1px solid var(--border); border-left:6px solid var(--gold); border-radius:16px; padding:20px 24px; margin-top:22px; }
   .story p { margin:0; }
-  h2 { font-size:28px; margin:40px 0 16px; }
+
+  /* Bir gün, iki ihtimal */
+  .split { display:grid; grid-template-columns:1fr 1fr; gap:22px; }
+  .side { position:relative; border-radius:22px; overflow:hidden; min-height:520px; color:#fff; display:flex; align-items:flex-end; }
+  .side img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .side::after { content:""; position:absolute; inset:0; background:linear-gradient(180deg, rgba(0,0,0,0) 35%, rgba(0,0,0,.82) 100%); }
+  .side div { position:relative; z-index:1; padding:26px; }
+  .side .tag { display:inline-block; font-size:14px; font-weight:800; letter-spacing:.05em; text-transform:uppercase; border-radius:8px; padding:4px 10px; margin-bottom:10px; }
+  .side.bad .tag { background:var(--red); }
+  .side.good .tag { background:var(--green2); }
+  .side h3 { font-size:26px; margin:0 0 8px; line-height:1.25; }
+  .side p { margin:0; color:#E8ECEA; font-size:17px; }
+
+  /* Taktik ve önlem */
+  .tactics { display:grid; gap:14px; }
+  .row { display:grid; grid-template-columns:1fr 64px 1fr; align-items:stretch; }
+  .row .scam, .row .fix { border-radius:16px; padding:18px 22px; }
+  .row .scam { background:#FBEDEA; border:1px solid #F0CFC8; }
+  .row .fix { background:#E5F4EA; border:1px solid #BFE0CB; }
+  .row b { display:block; font-size:19px; margin-bottom:4px; }
+  .row .scam b { color:#9E2B20; }
+  .row .fix b { color:#1E5A3E; }
+  .row p { margin:0; font-size:17px; }
+  .row .arrow { display:flex; align-items:center; justify-content:center; font-size:30px; color:var(--green); }
+
+  /* Özellikler */
   .grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:16px; }
-  .card { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:20px; }
+  .grid.six { grid-template-columns:repeat(3, 1fr); }
+  .card { background:var(--card); border:1px solid var(--border); border-radius:18px; padding:22px; }
   .card h3 { margin:0 0 6px; font-size:19px; }
   .card p { margin:0; color:var(--muted); font-size:16px; }
-  .ico { font-size:28px; display:block; margin-bottom:8px; }
-  .en { border-top:1px solid var(--border); margin-top:50px; padding-top:10px; }
-  footer { margin:50px 0 30px; color:var(--muted); font-size:15px; }
+  .ico { font-size:30px; display:block; margin-bottom:8px; }
+
+  /* Aileye haber */
+  .notify .wrap { display:grid; grid-template-columns:1fr 1fr; gap:48px; align-items:center; }
+  .photo { border-radius:22px; overflow:hidden; box-shadow:0 16px 50px rgba(0,0,0,.18); position:relative; }
+  .photo img { width:100%; aspect-ratio:4/5; object-fit:cover; }
+  .sms { position:absolute; left:18px; right:18px; top:18px; background:rgba(255,255,255,.96); border-radius:16px; padding:14px 16px; box-shadow:0 8px 24px rgba(0,0,0,.2); font-size:16px; }
+  .sms small { display:block; color:var(--muted); font-size:13px; margin-bottom:2px; }
+
+  /* Güven */
+  .trust { background:var(--night); color:#fff; }
+  .trust .lead { color:#C7D4CD; }
+  .trust .card { background:rgba(255,255,255,.06); border-color:rgba(255,255,255,.12); }
+  .trust .card p { color:#C7D4CD; }
+
+  /* Kurulum */
+  .steps { counter-reset:s; display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; }
+  .step { background:var(--card); border:1px solid var(--border); border-radius:18px; padding:24px; position:relative; }
+  .step::before { counter-increment:s; content:counter(s); display:flex; align-items:center; justify-content:center; width:44px; height:44px; border-radius:50%; background:var(--green); color:#fff; font-weight:800; font-size:20px; margin-bottom:12px; }
+  .step p { margin:0; }
+  .note { margin-top:16px; color:var(--muted); font-size:16px; }
+
+  /* SSS */
+  details { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:16px 20px; margin-bottom:10px; }
+  summary { cursor:pointer; font-weight:700; font-size:18px; }
+  details p { margin:10px 0 0; color:var(--muted); }
+
+  /* Son çağrı */
+  .cta { position:relative; color:#fff; text-align:center; padding:120px 0; overflow:hidden; }
+  .cta img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .cta::after { content:""; position:absolute; inset:0; background:rgba(14,24,19,.62); }
+  .cta .wrap { position:relative; z-index:1; }
+  .cta h2 { font-size:40px; }
+  .cta p { font-size:21px; color:#E8EFEA; margin:0 0 26px; }
+  .cta .btns { justify-content:center; }
+  .url { display:inline-block; margin-top:6px; font-size:24px; font-weight:800; color:#fff; border:3px solid var(--green2); border-radius:999px; padding:8px 26px; text-decoration:none; }
+
+  .en { border-top:1px solid var(--border); }
+  .en p { max-width:820px; }
+  footer { padding:30px 0 40px; color:var(--muted); font-size:15px; }
   footer a { margin-right:16px; }
-  @media (max-width:640px) { .hero { grid-template-columns:1fr; } .hero img { width:120px; height:120px; border-radius:28px; order:-1; } .hero h1 { font-size:30px; } nav a { margin-left:10px; } }
+
+  @media (max-width:860px) {
+    section { padding:48px 0; }
+    .hero .wrap, .film .wrap, .notify .wrap { grid-template-columns:1fr; gap:32px; }
+    .hero h1 { font-size:36px; }
+    .hero p { font-size:19px; }
+    .phone { width:min(260px, 80%); }
+    .split { grid-template-columns:1fr; }
+    .side { min-height:440px; }
+    .row { grid-template-columns:1fr; gap:6px; }
+    .row .arrow { transform:rotate(90deg); font-size:24px; }
+    .steps { grid-template-columns:1fr; }
+    .grid.six { grid-template-columns:1fr; }
+    h2 { font-size:28px; }
+    .cta { padding:80px 0; }
+    .cta h2 { font-size:30px; }
+    nav a.opt { display:none; }
+    nav a { margin-left:12px; }
+  }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior:auto; } }
 </style>
 </head>
 <body>
 <header>
   <div class="wrap">
     <a class="brand" href="/"><img src="/icon.png" alt="">WeAreNear</a>
-    <nav><a href="/privacy/">Gizlilik</a><a href="/support/">Destek</a><a href="#en">English</a></nav>
+    <nav><a class="opt" href="#video">Video</a><a class="opt" href="#nasil">Nasıl korur?</a><a href="#kurulum">Kurulum</a><a href="/support/">Destek</a><a href="#en">EN</a></nav>
   </div>
 </header>
 
-<main class="wrap">
+<main>
   <section class="hero">
-    <div>
-      <h1>Sevdikleriniz telefonda yalnız değil.</h1>
-      <p>WeAreNear, yaşlı yakınlarınızı telefon dolandırıcılığından korur. Tanımadığı numaraları engeller, uzun şüpheli görüşmeleri keser ve aileyi hemen haberdar eder.</p>
-      <span class="pill">Ücretsiz</span><span class="pill">Reklamsız</span><span class="pill">Sunucu yok, veriler telefonda</span>
+    <div class="wrap">
+      <div>
+        <span class="eyebrow">Telefon dolandırıcılığına karşı aile koruması</span>
+        <h1>Anneniz başına geleni size anlatır mı?</h1>
+        <p>Dolandırıcılar anne babalarımızı savcı ya da polis diye arıyor; saatlerce hatta tutuyor, korkutuyor, kimseye söyletmiyor. <strong>WeAreNear o aramayı hiç çaldırmaz ve size haber verir.</strong></p>
+        <div class="btns">
+          <a class="btn primary" href="#video">▶ Videoyu izleyin</a>
+          <span class="btn soon" title="Uygulama çok yakında Google Play'de">Google Play · Çok yakında</span>
+        </div>
+        <div class="pills"><span>Ücretsiz</span><span>Reklamsız</span><span>Konuşmaları dinlemez</span><span>Bilgiler telefonda kalır</span></div>
+      </div>
+      <div class="phone"><video src="/media/giris-dongu.mp4" poster="/media/giris-kapak.jpg" autoplay muted loop playsinline aria-label="Canlandırma: karakolda telefonla konuşurken ağlayan yaşlı bir kadın"></video></div>
     </div>
-    <img src="/icon.png" alt="WeAreNear simgesi: içinde telefon ahizesi olan beyaz kalp ve ona yaslanan küçük sarı kalp">
   </section>
 
-  <section class="story">
-    <p>Bu uygulama bir aile hikâyesinden doğdu: Annem, kendini polis olarak tanıtan dolandırıcılar tarafından 40 dakikadan uzun süre telefonda tutuldu. Para gönderilmesini son anda bir banka çalışanı durdurdu. Dolandırıcılar kurbanı uzun süre hatta tutup panik yaratarak çalışıyor. WeAreNear tam olarak buna karşı tasarlandı.</p>
+  <section class="film" id="video">
+    <div class="wrap">
+      <div>
+        <span class="eyebrow">Kısa film</span>
+        <h2>Bu sandalyeye kimse oturmasın.</h2>
+        <p class="lead">Her gün birçok anne baba, telefonda kendini savcı ya da polis diye tanıtan birine birikimini kaptırıyor. Çoğu zaman en ağır kısım para değil, utanç: Çocuklarına nasıl söyleyeceklerini bilemiyorlar.</p>
+        <div class="story"><p>Bu uygulama bir aile hikâyesinden doğdu: Annem, kendini polis olarak tanıtan dolandırıcılar tarafından 40 dakikadan uzun süre telefonda tutuldu. Para gönderilmesini son anda bir banka çalışanı durdurdu. Dolandırıcılar kurbanı uzun süre hatta tutup panik yaratarak çalışıyor. WeAreNear tam olarak buna karşı tasarlandı.</p></div>
+      </div>
+      <div class="player"><video src="/media/karakolda.mp4" poster="/media/karakolda-kapak.jpg" controls preload="none" playsinline aria-label="Karakolda: WeAreNear tanıtım filmi, altyazılı"></video></div>
+    </div>
   </section>
 
-  <h2>Neler yapar?</h2>
-  <div class="grid">
-    <div class="card"><span class="ico">🛡️</span><h3>Tanımadığı aramaları engeller</h3><p>Rehberde olmayan ve gizli numaralar telefonu hiç çaldırmaz. Aile isterse bu filtreyi kapatabilir.</p></div>
-    <div class="card"><span class="ico">⏱️</span><h3>Uzun görüşmeyi keser</h3><p>Tanımadığı biriyle görüşme seçilen süreyi aşınca otomatik kesilir, ardından güvendiği kişi aranır.</p></div>
-    <div class="card"><span class="ico">🔁</span><h3>Geri aramayı engeller</h3><p>"Hat kesilirse beni hemen geri ara" taktiğine karşı, kesilen numara bir süre aranamaz.</p></div>
-    <div class="card"><span class="ico">👨‍👩‍👧</span><h3>Aileyi haberdar eder</h3><p>Engellenen aramalar ve kesilen görüşmeler, ailenin seçtiği yolla (SMS ya da Telegram) bildirilir.</p></div>
-    <div class="card"><span class="ico">❤️</span><h3>Yardım düğmesi</h3><p>Ana ekrandaki düğmeye 3 saniye basılı tutunca yakınlar sırayla aranır ve haber verilir.</p></div>
-    <div class="card"><span class="ico">👵</span><h3>Yaşlı dostu ekran</h3><p>Büyük yazılar, büyük düğmeler, sade renkler. Kırmızı renk yalnızca şüpheli aramalar için kullanılır.</p></div>
-  </div>
+  <section>
+    <div class="wrap">
+      <span class="eyebrow">Aynı gün, iki ihtimal</span>
+      <h2>Fark, telefonun çalıp çalmamasında.</h2>
+      <p class="lead">Perihan teyzenin hikâyesi iki türlü bitebilir.</p>
+      <div class="split">
+        <div class="side bad">
+          <img src="/media/karakol-genis.webp" alt="Canlandırma: karakolda sandalyede yalnız oturan yaşlı kadın, elinde çay getiren kadın polis" loading="lazy">
+          <div><span class="tag">WeAreNear olmadan</span><h3>Saat 19:10, mahalle karakolu.</h3><p>“Savcıyım” diyen bir dolandırıcı onu 2 saat hatta tuttu. Şimdi tek düşündüğü: “Çocuklarıma nasıl söyleyeceğim?”</p></div>
+        </div>
+        <div class="side good">
+          <img src="/media/mutfak.webp" alt="Canlandırma: güneşli mutfakta mercimek çorbası pişiren gülümseyen yaşlı kadın, tezgahta telefonu" loading="lazy">
+          <div><span class="tag">WeAreNear ile</span><h3>Aynı günün sabahı, mutfakta.</h3><p>Tanımadığı numara aradı; telefon hiç çalmadı. Oğluna anında haber gitti. Akşam herkes sofrada.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-  <h2>Nasıl kurulur?</h2>
-  <div class="card">
-    <p>Kurulumu genellikle aileden biri yapar: WeAreNear varsayılan telefon uygulaması seçilir, güvenilir kişiler ve bildirim yolu belirlenir, ayarlar bir PIN ile kilitlenir. Korunan kişi ilk açılışta uygulamanın ne yaptığını anlatan ekranı görür ve onaylar. Kurulumdan sonra telefon her zamanki gibi kullanılır.</p>
-  </div>
+  <section id="nasil" style="background:#fff;">
+    <div class="wrap">
+      <span class="eyebrow">Dolandırıcılar nasıl çalışır?</span>
+      <h2>Her adımına karşı bir önlem</h2>
+      <p class="lead">Telefon dolandırıcılığı hep aynı sırayla ilerler. WeAreNear her adımı ayrı ayrı keser.</p>
+      <div class="tactics">
+        <div class="row"><div class="scam"><b>1. Korkutur</b><p>“Polis, savcı ya da banka” diye arar: “Oğlunuz kaza yaptı”, “Adınız bir soruşturmada geçiyor.”</p></div><div class="arrow">→</div><div class="fix"><b>Arama hiç gelmez</b><p>Rehberde olmayan ve gizli numaralar telefonu hiç çaldırmaz.</p></div></div>
+        <div class="row"><div class="scam"><b>2. Hatta tutar</b><p>“Kimseye söylemeyin, kapatmayın” der; dakikalarca, saatlerce konuşturur.</p></div><div class="arrow">→</div><div class="fix"><b>Görüşme sonlanır</b><p>Tanımadığı biriyle görüşme seçilen süreyi aşınca otomatik sonlandırılır, ardından güvendiği kişi aranır.</p></div></div>
+        <div class="row"><div class="scam"><b>3. Geri arattırır</b><p>“Hat kesilirse beni hemen geri ara” der.</p></div><div class="arrow">→</div><div class="fix"><b>Geri arama engellenir</b><p>Kesilen numara bir süre aranamaz.</p></div></div>
+        <div class="row"><div class="scam"><b>4. Yalnız bırakır</b><p>Aile olanları en son, iş işten geçince öğrenir.</p></div><div class="arrow">→</div><div class="fix"><b>Aile anında haberdar</b><p>Engellenen arama ve sonlandırılan görüşmeler SMS ya da Telegram ile hemen bildirilir.</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="notify">
+    <div class="wrap">
+      <div class="photo">
+        <img src="/media/serkan-ofis.webp" alt="Canlandırma: ofisinde telefonuna gelen bildirimi okuyup rahatlayan adam" loading="lazy">
+        <div class="sms"><small>SMS · WeAreNear</small>Rehberde olmayan 0850 XXX XX XX numarası aradı, arama engellendi.</div>
+      </div>
+      <div>
+        <span class="eyebrow">Aileye anında haber</span>
+        <h2>Annenizin telefonunda ne olduğunu ilk siz bilirsiniz.</h2>
+        <p class="lead">Engellenen her arama, sonlandırılan her şüpheli görüşme, rehberdeki her değişiklik ve yardım çağrısı; seçtiğiniz yakınlara SMS ya da Telegram ile, arayan numarayla birlikte bildirilir.</p>
+        <p class="lead" style="margin-bottom:0">Böylece anneniz utandığı için anlatmasa bile, siz bilirsiniz.</p>
+      </div>
+    </div>
+  </section>
+
+  <section style="padding-top:0;">
+    <div class="wrap">
+      <h2>Neler yapar?</h2>
+      <div class="grid six">
+        <div class="card"><span class="ico">🛡️</span><h3>Tanımadığı aramaları engeller</h3><p>Rehberde olmayan ve gizli numaralar telefonu hiç çaldırmaz. Aile isterse bu filtreyi kapatabilir.</p></div>
+        <div class="card"><span class="ico">⏱️</span><h3>Uzun görüşmeyi sonlandırır</h3><p>Tanımadığı biriyle görüşme seçilen süreyi aşınca otomatik sonlanır, ardından güvendiği kişi aranır.</p></div>
+        <div class="card"><span class="ico">🔁</span><h3>Geri aramayı engeller</h3><p>“Hat kesilirse beni hemen geri ara” taktiğine karşı, kesilen numara bir süre aranamaz.</p></div>
+        <div class="card"><span class="ico">👨‍👩‍👧</span><h3>Aileyi haberdar eder</h3><p>Engellenen aramalar ve sonlandırılan görüşmeler, ailenin seçtiği yolla (SMS ya da Telegram) bildirilir.</p></div>
+        <div class="card"><span class="ico">❤️</span><h3>Yardım düğmesi</h3><p>Ana ekrandaki düğmeye 3 saniye basılı tutunca yakınlar sırayla aranır ve haber verilir.</p></div>
+        <div class="card"><span class="ico">👵</span><h3>Yaşlı dostu ekran</h3><p>Büyük yazılar, büyük düğmeler, sade renkler. Kırmızı renk yalnızca şüpheli aramalar için kullanılır.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="trust">
+    <div class="wrap">
+      <span class="eyebrow" style="color:#8FD3AC;">Neden güvenebilirsiniz?</span>
+      <h2>Korur, ama gözetlemez.</h2>
+      <p class="lead">Bir güvenlik uygulamasının kendisi de güvenilir olmalı.</p>
+      <div class="grid">
+        <div class="card"><span class="ico">🎙️</span><h3>Konuşmaları dinlemez</h3><p>Uygulamanın mikrofon izni yoktur; görüşmeler dinlenmez, kaydedilmez.</p></div>
+        <div class="card"><span class="ico">📱</span><h3>Sunucu yok</h3><p>Rehber ve arama kayıtları telefonda kalır, bize gelmez.</p></div>
+        <div class="card"><span class="ico">🚫</span><h3>Reklam yok</h3><p>Reklam gösterilmez, veri satılmaz.</p></div>
+        <div class="card"><span class="ico">🏠</span><h3>Bir aile hikâyesinden</h3><p>Aynı şeyi yaşamış bir ailenin, başkaları yaşamasın diye geliştirdiği bir çözüm.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="kurulum">
+    <div class="wrap">
+      <span class="eyebrow">Kolayca kurulur</span>
+      <h2>Nasıl kurulur?</h2>
+      <p class="lead">Kurulumu genellikle aileden biri, annesinin ya da babasının telefonunda birlikte yapar.</p>
+      <div class="steps">
+        <div class="step"><p><b>İndirin.</b> Sevdiğinizin telefonuna WeAreNear'ı Google Play'den yükleyin.</p></div>
+        <div class="step"><p><b>Varsayılan telefon uygulaması yapın.</b> Güvenilir kişileri ve kendi numaranızı ekleyin.</p></div>
+        <div class="step"><p><b>Bildirim yolunu seçin.</b> SMS ya da Telegram. Ayarları bir PIN ile kilitleyin; hepsi bu.</p></div>
+      </div>
+      <p class="note">Korunan kişi ilk açılışta uygulamanın ne yaptığını anlatan ekranı görür ve onaylar. Kurulumdan sonra telefon her zamanki gibi kullanılır.</p>
+    </div>
+  </section>
+
+  <section style="padding-top:0;">
+    <div class="wrap">
+      <h2>Sık sorulanlar</h2>
+      <details><summary>Annemin tanıdığı kişilerin aramaları etkilenir mi?</summary><p>Hayır. Rehberdeki kişiler her zamanki gibi arar.</p></details>
+      <details><summary>Bankası, hastane ya da kargo ararsa?</summary><p>Aile bu numaraları rehbere ekleyebilir ya da tanımadık numara filtresini belirli bir süre için kapatabilir. Engellenen her arama size bildirildiği için önemli bir aramayı kaçırırsanız hemen haberiniz olur.</p></details>
+      <details><summary>İnternet gerekiyor mu?</summary><p>Koruma için gerekmez. Bildirimler SMS ile gidebilir; Telegram seçilirse internet gerekir.</p></details>
+      <details><summary>Ücretli mi?</summary><p>Hayır, ücretsiz ve reklamsız.</p></details>
+      <details><summary>iPhone'da çalışır mı?</summary><p>Şimdilik yalnızca Android telefonlarda çalışır.</p></details>
+      <details><summary>Ayarları başkası değiştirebilir mi?</summary><p>Ayarlar bir PIN ile kilitlenir. WeAreNear varsayılan telefon uygulaması olmaktan çıkarılırsa aileye haber verilir.</p></details>
+    </div>
+  </section>
+
+  <section class="cta">
+    <img src="/media/sofra.webp" alt="">
+    <div class="wrap">
+      <h2>Bu akşam annenizi arayın.</h2>
+      <p>WeAreNear'ı telefonuna birlikte kurun. Sevdikleriniz telefonda yalnız kalmasın.</p>
+      <div class="btns"><span class="btn soon" style="color:#fff;">Google Play · Çok yakında</span></div>
+      <a class="url" href="https://www.wearenear.app">www.wearenear.app</a>
+    </div>
+  </section>
 
   <section class="en" id="en" lang="en">
-    <h2>WeAreNear, in English</h2>
-    <p><strong>Your loved ones are never alone on the phone.</strong> WeAreNear protects older family members from phone scams. It silently blocks calls from numbers that are not in their contacts, ends long calls with unknown numbers after a time limit, prevents scammers from calling straight back, and lets the family know by SMS or Telegram. A help button calls trusted contacts one by one. The app is free, has no ads, and has no servers: everything stays on the phone.</p>
-    <p>The idea came from a real family story: scammers posing as police kept our mother on the line for more than 40 minutes, and a bank employee stopped the transfer at the last moment.</p>
+    <div class="wrap">
+      <h2>WeAreNear, in English</h2>
+      <p><strong>Your loved ones are never alone on the phone.</strong> WeAreNear protects older family members from phone scams. It silently blocks calls from numbers that are not in their contacts, ends long calls with unknown numbers after a time limit, prevents scammers from calling straight back, and lets the family know by SMS or Telegram. A help button calls trusted contacts one by one. The app is free, has no ads, does not listen to calls, and has no servers: everything stays on the phone.</p>
+      <p>The idea came from a real family story: scammers posing as police kept our mother on the line for more than 40 minutes, and a bank employee stopped the transfer at the last moment.</p>
+    </div>
   </section>
 </main>
 
-<footer class="wrap">
-  <a href="/privacy/">Gizlilik politikası / Privacy policy</a><a href="/support/">Destek / Support</a><br>
-  © 2026 WeAreNear · <a href="mailto:guvenlihatdestek@proton.me">guvenlihatdestek@proton.me</a>
+<footer>
+  <div class="wrap">
+    <a href="/privacy/">Gizlilik politikası / Privacy policy</a><a href="/support/">Destek / Support</a><br>
+    © 2026 WeAreNear · <a href="mailto:guvenlihatdestek@proton.me">guvenlihatdestek@proton.me</a><br>
+    <small>Sitedeki film ve görseller yapay zekâ ile üretilmiş canlandırmalardır.</small>
+  </div>
 </footer>
 </body>
 </html>
