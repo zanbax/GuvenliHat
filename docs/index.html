@@ -58,6 +58,12 @@
   .film .wrap { display:grid; grid-template-columns:.9fr 1.1fr; gap:48px; align-items:center; }
   .player { width:min(380px, 100%); justify-self:center; border-radius:22px; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,.25); background:#000; }
   .player video { width:100%; aspect-ratio:9/16; }
+  .filmbox { width:min(380px, 100%); justify-self:center; }
+  .filmbox .player { width:100%; }
+  .versions { display:flex; gap:8px; justify-content:center; margin-top:14px; flex-wrap:wrap; }
+  .versions button { font:inherit; font-size:15px; font-weight:700; padding:8px 16px; border-radius:999px; border:1px solid var(--border); background:var(--card); color:var(--text); cursor:pointer; }
+  .versions button.on { background:var(--green); border-color:var(--green); color:#fff; }
+  .vnote { text-align:center; color:var(--muted); font-size:14px; margin:8px 0 0; }
   .story { background:var(--card); border:1px solid var(--border); border-left:6px solid var(--gold); border-radius:16px; padding:20px 24px; margin-top:22px; }
   .story p { margin:0; }
 
@@ -187,7 +193,15 @@
         <p class="lead">Her gün birçok anne baba, telefonda kendini savcı ya da polis diye tanıtan birine birikimini kaptırıyor. Çoğu zaman en ağır kısım para değil, utanç: Çocuklarına nasıl söyleyeceklerini bilemiyorlar.</p>
         <div class="story"><p>Bu uygulama bir aile hikâyesinden doğdu: Annem, kendini polis olarak tanıtan dolandırıcılar tarafından 40 dakikadan uzun süre telefonda tutuldu. Para gönderilmesini son anda bir banka çalışanı durdurdu. Dolandırıcılar kurbanı uzun süre hatta tutup panik yaratarak çalışıyor. WeAreNear tam olarak buna karşı tasarlandı.</p></div>
       </div>
-      <div class="player"><video src="/media/karakolda.mp4" poster="/media/karakolda-kapak.jpg" controls preload="none" playsinline aria-label="Karakolda: WeAreNear tanıtım filmi, altyazılı"></video></div>
+      <div class="filmbox">
+        <div class="player"><video id="film" src="/media/karakolda.mp4" poster="/media/karakolda-kapak.jpg" controls preload="none" playsinline aria-label="Karakolda: WeAreNear tanıtım filmi, sesli ve altyazılı"></video></div>
+        <div class="versions" role="group" aria-label="Film sürümü">
+          <button type="button" class="on" data-src="/media/karakolda.mp4" aria-pressed="true">Tam film · 77 sn</button>
+          <button type="button" data-src="/media/karakolda-30sn.mp4" aria-pressed="false">30 sn</button>
+          <button type="button" data-src="/media/karakolda-15sn.mp4" aria-pressed="false">15 sn</button>
+        </div>
+        <p class="vnote">Sesli ve altyazılı. Sesi açarak izleyin.</p>
+      </div>
     </div>
   </section>
 
@@ -318,5 +332,11 @@
     <small>Sitedeki film ve görseller yapay zekâ ile üretilmiş canlandırmalardır.</small>
   </div>
 </footer>
+<script>
+(function(){var v=document.getElementById('film');if(!v)return;var bs=document.querySelectorAll('.versions button');
+bs.forEach(function(b){b.addEventListener('click',function(){if(b.classList.contains('on'))return;
+bs.forEach(function(x){x.classList.remove('on');x.setAttribute('aria-pressed','false');});b.classList.add('on');b.setAttribute('aria-pressed','true');
+v.pause();v.src=b.dataset.src;v.load();var pr=v.play();if(pr&&pr.catch)pr.catch(function(){});});});})();
+</script>
 </body>
 </html>
